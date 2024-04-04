@@ -20,8 +20,25 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<!-- KakaoLogin -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>Kakao</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>kakaoc87ec3105e4c3437a1ca3ce3a2f33ed6</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<!-- KakaoLogin -->
+	<key>KAKAO_APP_KEY</key>
+	<string>c87ec3105e4c3437a1ca3ce3a2f33ed6</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
