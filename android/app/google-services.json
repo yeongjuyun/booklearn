@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "33395763326",
+    "project_id": "booklearn-58f92",
+    "storage_bucket": "booklearn-58f92.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:33395763326:android:8a8e247e83f0bfcfbc102f",
+        "android_client_info": {
+          "package_name": "com.booklearn"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "33395763326-rrgmoou2f7o8kmli52j1fvvfp13fvi1e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.booklearn",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "33395763326-gvhl1ois76oae40e2ofmort9ddac4vn1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdcTLDWf6BRbcAoWW-3G724_yanQypews"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "33395763326-gvhl1ois76oae40e2ofmort9ddac4vn1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "33395763326-osvnrurhbolc4qo4rr2d54j0fvb9ho38.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.booklearn"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -3,13 +3,17 @@
 #import <React/RCTBundleURLProvider.h>
 
 #import <RNKakaoLogins.h>
-
+// Google Login
+#import <Firebase.h>
 
 @implementation AppDelegate
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+  // Google Login - Firebase 초기화
+  [FIRApp configure];
+
   self.moduleName = @"booklearn";
   // You can add your custom initial props in the dictionary below.
   // They will be passed down to the ViewController used by React Native.
