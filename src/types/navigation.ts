@@ -59,6 +59,11 @@ export type SearchStackParamList = {
 export type SettingStackParamList = {
   Main: undefined;
   Profile: undefined;
+  ProfileNickname: undefined;
+  ProfilePassword: undefined;
+  ReleaseNote: undefined;
+  ReleaseNoteDetail: {title: string};
+  ThemeSetting: undefined;
 };
 
 export type TabParamList = {

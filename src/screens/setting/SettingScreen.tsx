@@ -2,7 +2,14 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList, SettingStackParamList} from 'types/navigation';
 import Text from 'components/atoms/Text';
 import DefaultLayout from 'layouts/DefaultLayout';
-import {StyleSheet, TouchableOpacity, View, useColorScheme} from 'react-native';
+import {
+  Alert,
+  Linking,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  useColorScheme,
+} from 'react-native';
 import Icon from 'components/atoms/Icon';
 import ListItem from 'components/molecules/ListItem';
 import {Colors} from 'constants/theme';
@@ -28,6 +35,24 @@ const SettingScreen = ({navigation}: SettingScreenProps) => {
     navigation.navigate('Auth');
   };
 
+  const handlePressNotDevelop = () => {
+    Alert.alert('업데이트 예정', '현재 준비중인 기능입니다');
+  };
+
+  const handlePressInquire = async () => {
+    const recipientEmail = 'booklearn.contact@gmail.com';
+    const subject = encodeURIComponent('제목');
+    const body = encodeURIComponent('메일 내용을 입력하세요');
+
+    const mailtoLink = `mailto:${recipientEmail}?subject=${subject}&body=${body}`;
+
+    try {
+      await Linking.openURL(mailtoLink);
+    } catch (error) {
+      console.error('메일 앱을 여는 중 오류 발생:', error);
+    }
+  };
+
   return (
     <DefaultLayout
       headerTitle="설정"
@@ -48,6 +73,7 @@ const SettingScreen = ({navigation}: SettingScreenProps) => {
           <ListItem
             title="릴리즈 노트"
             endContent={<Icon name="expand_move" />}
+            onPress={() => navigation.navigate('ReleaseNote')}
           />
         </View>
       </View>
@@ -63,6 +89,7 @@ const SettingScreen = ({navigation}: SettingScreenProps) => {
           <ListItem
             title="계정 정보"
             endContent={<Icon name="expand_move" />}
+            onPress={() => navigation.navigate('Profile')}
           />
         </View>
       </View>
@@ -78,10 +105,12 @@ const SettingScreen = ({navigation}: SettingScreenProps) => {
           <ListItem
             title="테마 설정"
             endContent={<Icon name="expand_move" />}
+            onPress={handlePressNotDevelop}
           />
           <ListItem
             title="알림 설정"
             endContent={<Icon name="expand_move" />}
+            onPress={handlePressNotDevelop}
           />
         </View>
       </View>
@@ -96,9 +125,8 @@ const SettingScreen = ({navigation}: SettingScreenProps) => {
             {borderColor: borderColor, backgroundColor: listBackgroundColor},
           ]}>
           <ListItem title="약관 및 정책" />
-          <ListItem title="오픈소스 라이센스" />
-          <ListItem title="앱 버전" />
-          <ListItem title="문의하기" />
+          <ListItem title="앱 버전" endContent={<Text>v1.0.0</Text>} />
+          <ListItem title="문의하기" onPress={handlePressInquire} />
           <ListItem title="로그아웃" onPress={handlePressLogout} />
         </View>
       </View>
@@ -117,10 +145,5 @@ const styles = StyleSheet.create({
   listWrapper: {
     borderTopWidth: 0.5,
     borderBottomWidth: 0.5,
-    // flex: 1,
-    // fontSize: 16,
-    // textAlignVertical: 'top',
-    // padding: 16,
-    // backgroundColor: 'red',
   },
 });

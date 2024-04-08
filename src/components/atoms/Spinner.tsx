@@ -1,10 +1,27 @@
-import {ActivityIndicator, StyleSheet, View} from 'react-native';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  View,
+  useColorScheme,
+} from 'react-native';
 import {Colors} from 'constants/theme';
 
-const Spinner = () => {
+type SpinnerProps = {
+  size?: 'small' | 'large';
+  color?: string;
+};
+
+const Spinner = ({size = 'large', color}: SpinnerProps) => {
+  const isDarkMode = useColorScheme() === 'dark';
+  const spinnerColor = color
+    ? color
+    : isDarkMode
+    ? Colors.white
+    : Colors.primary;
+
   return (
     <View style={styles.spinnerWrapper}>
-      <ActivityIndicator size="large" color={Colors.primary} />
+      <ActivityIndicator size={size} color={spinnerColor} />
     </View>
   );
 };

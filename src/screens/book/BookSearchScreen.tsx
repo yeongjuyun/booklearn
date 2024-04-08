@@ -116,7 +116,7 @@ const BookSearchScreen = ({navigation}: BookSearchScreenProps) => {
       ) : keyword ? (
         Array.isArray(searchedBooks) ? (
           searchedBooks.length > 0 ? (
-            <SearchResultList books={searchedBooks} />
+            <SearchResultList navigation={navigation} books={searchedBooks} />
           ) : (
             <View style={styles.centeredWrapper}>
               <Text>조회된 검색 결과가 없습니다</Text>

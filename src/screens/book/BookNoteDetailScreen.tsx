@@ -1,5 +1,6 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {
+  Alert,
   Image,
   Platform,
   ScrollView,
@@ -12,7 +13,8 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import Api from 'libs/axios/api';
 import {ResponseType} from 'types/common';
 import {BookStackParamList} from 'types/navigation';
-import {Book} from 'types/book';
+import {Book, MemoSortType} from 'types/book';
+import {INIT_BOOK_MEMO} from 'constants/init';
 import {Colors} from 'constants/theme';
 import Icon from 'components/atoms/Icon';
 import Text from 'components/atoms/Text';
@@ -28,20 +30,47 @@ type BookNoteDetailScreenProps = {
 
 type BookNoteDetailScreenRouteProp = RouteProp<BookStackParamList, 'Detail'>;
 
-const MemoSortListItem = ['최신순', '오래된순', '페이지순', '페이지역순'];
-
-const INIT_BOOK_MEMO = {
-  id: '',
-  page: 0,
-  content: '',
-  createdAt: '',
-};
-
 const BookNoteDetailScreen = ({navigation}: BookNoteDetailScreenProps) => {
   const route = useRoute<BookNoteDetailScreenRouteProp>();
   const [bookDetail, setBookDetail] = useState<Book>();
-  const [memoSortIndex, setMemoSortIndex] = useState<number>(0);
+  const [memoSortType, setMemoSortType] = useState<MemoSortType>(
+    MemoSortType.LATEST,
+  );
   const [memoSortVisible, setMemoSortVisible] = useState<boolean>(false);
+  const [memoSettingVisible, setMemoSettingVisible] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const sortedBookMemoList = useMemo(() => {
+    if (!bookDetail || !Array.isArray(bookDetail.memoList)) {
+      return [];
+    }
+
+    let sortedMemos = [...bookDetail.memoList];
+    switch (memoSortType) {
+      case MemoSortType.LATEST:
+        sortedMemos.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        );
+        break;
+      case MemoSortType.OLDEST:
+        sortedMemos.sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+        );
+        break;
+      case MemoSortType.PAGE_ASC:
+        sortedMemos.sort((a, b) => a.page - b.page);
+        break;
+      case MemoSortType.PAGE_DESC:
+        sortedMemos.sort((a, b) => b.page - a.page);
+        break;
+      default:
+        sortedMemos = [...bookDetail.memoList];
+        break;
+    }
+    return sortedMemos;
+  }, [bookDetail, memoSortType]);
 
   const handlePressSort = () => {
     setMemoSortVisible(true);
@@ -51,9 +80,51 @@ const BookNoteDetailScreen = ({navigation}: BookNoteDetailScreenProps) => {
     setMemoSortVisible(false);
   };
 
-  const handlePressSortOption = (index: number) => {
-    setMemoSortIndex(index);
+  const handlePressSortOption = (type: MemoSortType) => {
+    setMemoSortType(type);
     setMemoSortVisible(false);
+  };
+
+  const handlePressSetting = () => {
+    setMemoSettingVisible(true);
+  };
+
+  const handleCancelSetting = () => {
+    setMemoSettingVisible(false);
+  };
+
+  const handlePressDeleteBook = () => {
+    //TODO: 책 삭제 API 테스트 필요
+    Alert.alert('삭제', '책을 삭제하시겠습니까?', [
+      {text: '취소', style: 'cancel', onPress: handleCancelSetting},
+      {
+        text: '삭제',
+        style: 'destructive',
+        onPress: () => {
+          if (!bookDetail?.id) {
+            return Alert.alert(
+              '요청 실패',
+              '책을 삭제하는 동안 오류가 발생했습니다',
+            );
+          }
+
+          setIsLoading(true);
+
+          const payload = {id: bookDetail.id};
+          Api.bookshelf.deleteBookshelfById(payload, response => {
+            //TODO: 로딩처리, 기능 확인
+            console.log('response', response);
+            if (response.type === ResponseType.SUCCESS) {
+              navigation.navigate('Main');
+            } else {
+              Alert.alert('요청 실패', response.message);
+            }
+            handleCancelSetting();
+            setIsLoading(false);
+          });
+        },
+      },
+    ]);
   };
 
   useEffect(() => {
@@ -82,10 +153,6 @@ const BookNoteDetailScreen = ({navigation}: BookNoteDetailScreenProps) => {
     return unsubscribe;
   }, [navigation, route.params?.id]);
 
-  if (!bookDetail) {
-    return <Spinner />;
-  }
-
   return (
     <DefaultLayout
       headerTitle="독서 기록"
@@ -95,66 +162,83 @@ const BookNoteDetailScreen = ({navigation}: BookNoteDetailScreenProps) => {
           <Icon name="arrow_back" size={20} />
         </TouchableOpacity>
       }
-      headerRightContent={<Icon name="share" />}>
-      <ScrollView style={styles.base}>
-        <View style={styles.bookDetailWrapper}>
-          <Image source={{uri: bookDetail.cover}} style={styles.cover} />
-          <View style={styles.bookInfoWrapper}>
-            <Text h4 numberOfLines={2}>
-              {bookDetail.title}
-            </Text>
-            <View style={{flex: 1}}>
-              <Text caption>{bookDetail.author}</Text>
-              <Text caption>{bookDetail.publisher}</Text>
+      headerRightContent={
+        <TouchableOpacity onPress={handlePressSetting}>
+          <Icon name="more_horizontal" />
+        </TouchableOpacity>
+      }>
+      {!bookDetail ? (
+        <View style={styles.spinnerWrapper}>
+          <Spinner />
+        </View>
+      ) : (
+        <>
+          <ScrollView style={styles.base}>
+            <View style={styles.bookDetailWrapper}>
+              <Image source={{uri: bookDetail.cover}} style={styles.cover} />
+              <View style={styles.bookInfoWrapper}>
+                <Text h4 numberOfLines={2}>
+                  {bookDetail.title}
+                </Text>
+                <View style={{flex: 1}}>
+                  <Text caption>{bookDetail.author}</Text>
+                  <Text caption>{bookDetail.publisher}</Text>
+                </View>
+                <Button size="m" onPress={() => navigation.navigate('Essay')}>
+                  에세이 보기
+                </Button>
+              </View>
             </View>
-            <Button size="m" onPress={() => navigation.navigate('Essay')}>
-              에세이 보기
-            </Button>
-          </View>
-        </View>
-        <View style={styles.bookMemoWrapper}>
-          <View style={styles.bookMemoHeader}>
-            <Text h4>메모 {bookDetail.memoList.length}</Text>
-            <TouchableOpacity
-              activeOpacity={0.8}
-              style={styles.bookMemoSort}
-              onPress={handlePressSort}>
-              <Icon name="sort" />
-              <Text body>{MemoSortListItem[memoSortIndex]}</Text>
-            </TouchableOpacity>
-          </View>
-          <BookMemoList
-            bookId={bookDetail.id}
-            data={bookDetail.memoList}
-            navigation={navigation}
-          />
-        </View>
-      </ScrollView>
-      <TouchableOpacity
-        activeOpacity={1}
-        style={styles.floatingButton}
-        onPress={() =>
-          navigation.navigate('EditMemo', {
-            id: bookDetail.id,
-            bookMemo: INIT_BOOK_MEMO,
-          })
-        }>
-        <Icon name="write" size={24} color={Colors.white} />
-      </TouchableOpacity>
+            <View style={styles.bookMemoWrapper}>
+              <View style={styles.bookMemoHeader}>
+                <Text h4>메모 {bookDetail.memoList.length}</Text>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  style={styles.bookMemoSort}
+                  onPress={handlePressSort}>
+                  <Icon name="sort" />
+                  <Text body>{memoSortType}</Text>
+                </TouchableOpacity>
+              </View>
+              <BookMemoList
+                bookId={bookDetail.id}
+                data={sortedBookMemoList}
+                navigation={navigation}
+              />
+            </View>
+          </ScrollView>
+          <TouchableOpacity
+            activeOpacity={1}
+            style={styles.floatingButton}
+            onPress={() =>
+              navigation.navigate('EditMemo', {
+                id: bookDetail.id,
+                bookMemo: INIT_BOOK_MEMO,
+              })
+            }>
+            <Icon name="write" size={24} color={Colors.white} />
+          </TouchableOpacity>
+        </>
+      )}
+      {/* 정렬 ActionSheet */}
       <ActionSheet
         title="정렬 기준 선택"
         visible={memoSortVisible}
         onCancel={handleCancelSort}>
-        {MemoSortListItem.map((item, index) => {
+        {Object.values(MemoSortType).map(type => {
           return (
             <ActionSheetItem
-              key={index}
-              title={item}
-              isSelected={memoSortIndex === index}
-              onPress={() => handlePressSortOption(index)}
+              key={type}
+              title={type}
+              isSelected={memoSortType === type}
+              onPress={() => handlePressSortOption(type)}
             />
           );
         })}
+      </ActionSheet>
+      {/* 네비게이션 우측 메뉴 ActionSheet */}
+      <ActionSheet visible={memoSettingVisible} onCancel={handleCancelSetting}>
+        <ActionSheetItem title={'삭제하기'} onPress={handlePressDeleteBook} />
       </ActionSheet>
     </DefaultLayout>
   );
@@ -165,6 +249,10 @@ export default BookNoteDetailScreen;
 const styles = StyleSheet.create({
   base: {
     flex: 1,
+  },
+  spinnerWrapper: {
+    flex: 1,
+    marginBottom: 60, // layoutHeader 영역만큼 위로 올리기
   },
   bookDetailWrapper: {
     flexDirection: 'row',
@@ -219,42 +307,3 @@ const styles = StyleSheet.create({
     }),
   },
 });
-
-const MOCK_BOOK_DETAIL = {
-  id: '123',
-  title: '제목책제목책제목책제목책제목책제목책제목책제목책제목책제목책제목',
-  cover: 'https://edit.org/images/cat/bookDetail-covers-big-2019101610.jpg',
-  author: '작가작가작가작가작가작가작가작가작가작가작가',
-  publish: '출판사출판사출판사출판사출판사출판사출판사출판사출판사',
-};
-
-const MOCK_BOOK_MEMO_LIST_DATA = [
-  {
-    id: '1',
-    pageNum: 97,
-    createdAt: '2024.03.03',
-    content:
-      '내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용',
-  },
-  {
-    id: '2',
-    pageNum: 3,
-    createdAt: '2024.03.03',
-    content:
-      ' 내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용',
-  },
-  {
-    id: '3',
-    pageNum: 44,
-    createdAt: '2024.03.03',
-    content:
-      '내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용',
-  },
-  {
-    id: '4',
-    pageNum: 44,
-    createdAt: '2024.03.03',
-    content:
-      '내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용',
-  },
-];

@@ -72,7 +72,7 @@ const ActionSheetItem = ({
   onPress,
 }: {
   title: string;
-  isSelected: boolean;
+  isSelected?: boolean;
   onPress: () => void;
 }) => {
   const isDarkMode = useColorScheme() === 'dark';

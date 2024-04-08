@@ -9,6 +9,7 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import Api from 'libs/axios/api';
 import {RootStackParamList, AuthStackParamList} from 'types/navigation';
 import SigninImage from 'assets/image/signin.png';
+import BookImage from 'assets/image/books.png';
 import {Colors} from 'constants/theme';
 import Icon from 'components/atoms/Icon';
 import Text from 'components/atoms/Text';
@@ -26,8 +27,11 @@ function SocialLoginScreen({navigation}: SocialLoginScreenProps) {
   const appleButtonTextColor = isDarkMode ? Colors.black : Colors.white;
 
   const signinWithKakao = () => {
-    console.log(1111);
     Api.auth.signinWithKakao(undefined, undefined, navigation);
+  };
+
+  const signinWidthGoogle = () => {
+    Api.auth.signinWidthGoogle(undefined, undefined, navigation);
   };
 
   return (
@@ -39,7 +43,7 @@ function SocialLoginScreen({navigation}: SocialLoginScreenProps) {
       }>
       <View style={styles.wrapper}>
         <View style={styles.logoWrapper}>
-          <Image source={SigninImage} style={styles.logoImage} />
+          <Image source={BookImage} style={styles.logoImage} />
           <View style={styles.logo}>
             <Text h1>Book</Text>
             <Text h1 style={{color: Colors.primary}}>
@@ -77,7 +81,7 @@ function SocialLoginScreen({navigation}: SocialLoginScreenProps) {
                 backgroundColor: Colors.white,
               }}
               textStyle={{color: Colors.black}}
-              onPress={() => navigation.navigate('Home')}>
+              onPress={signinWidthGoogle}>
               <Icon name="google_logo" size={18} />
               구글로 계속하기
             </Button>

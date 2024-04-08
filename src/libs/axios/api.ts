@@ -1,7 +1,13 @@
 import * as KakaoLogin from '@react-native-seoul/kakao-login';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {saveTokensToStorage} from 'libs/async-storage';
 import {Response, ResponseType} from 'types/common';
-import {GET, POST} from './instance';
+import {DELETE, GET, POST} from './instance';
+
+GoogleSignin.configure({
+  webClientId:
+    '33395763326-gvhl1ois76oae40e2ofmort9ddac4vn1.apps.googleusercontent.com',
+});
 
 const authApis = {
   signinWithKakao: async (
@@ -22,12 +28,27 @@ const authApis = {
       }
     });
   },
+  signinWidthGoogle: async (
+    payload?: {},
+    callback?: (response: Response) => void,
+    navigation?: any,
+  ) => {
+    await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
+    const {idToken} = await GoogleSignin.signIn();
+    console.log('idToken', idToken);
+
+    if (idToken) {
+      POST('/users/sign-in/google', {accessToken: idToken}, response => {
+        console.log('response', response);
+      });
+    }
+  },
   signinWithLocal: async (
     payload: {email: string; password: string},
     callback?: (response: Response) => void,
     navigation?: any,
   ) => {
-    await POST('/users/sign-in/kakao', payload, callback, navigation);
+    await POST('/users/sign-in/local', payload, callback, navigation);
   },
   signupWithLocal: async (
     payload: {name: string; email: string; password: string},
@@ -37,28 +58,18 @@ const authApis = {
     await POST('/users/sign-up/local', payload, callback, navigation);
   },
   sendEmailVerificationCode: async (
-    payload: {email: string},
+    payload: {email: string; isSignUp: boolean},
     callback?: (response: Response) => void,
     navigation?: any,
   ) => {
-    await POST(
-      '/users/sign-up/local/send-email',
-      payload,
-      callback,
-      navigation,
-    );
+    await POST('/auth/send-email', payload, callback, navigation);
   },
   verifyEmailVerificationCode: async (
-    payload: {email: string},
+    payload: {email: string; code: string},
     callback?: (response: Response) => void,
     navigation?: any,
   ) => {
-    await POST(
-      '/users/sign-up/local/verify-email',
-      payload,
-      callback,
-      navigation,
-    );
+    await POST('/auth/verify-email', payload, callback, navigation);
   },
   resetPassword: async (
     payload: {email: string},
@@ -66,6 +77,23 @@ const authApis = {
     navigation?: any,
   ) => {
     await POST('/users/reset-password', payload, callback, navigation);
+  },
+};
+
+const userApis = {
+  updateNickname: async (
+    payload: {name: string},
+    callback?: (response: Response) => void,
+    navigation?: any,
+  ) => {
+    await POST('/users/name', payload, callback, navigation);
+  },
+  updatePassword: async (
+    payload: {password: string},
+    callback?: (response: Response) => void,
+    navigation?: any,
+  ) => {
+    await POST('/users/password', payload, callback, navigation);
   },
 };
 
@@ -153,10 +181,19 @@ const bookshelfApis = {
     const {id, page, content} = payload;
     await POST(`/bookshelf/${id}/memo`, {page, content}, callback, navigation);
   },
+  deleteBookshelfById: async (
+    payload: {id: string},
+    callback?: (response: Response) => void,
+    navigation?: any,
+  ) => {
+    const {id} = payload;
+    await DELETE(`/bookshelf/${id}`, {}, callback, navigation);
+  },
 };
 
 const Api = {
   auth: authApis,
+  user: userApis,
   book: bookApis,
   bookshelf: bookshelfApis,
 };

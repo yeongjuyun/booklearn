@@ -1,26 +1,32 @@
-import React, {useState} from 'react';
+import React from 'react';
+import useSWR from 'swr';
 import {KeyboardAvoidingView, Platform, StyleSheet} from 'react-native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {AuthStackParamList} from 'types/navigation';
-import EmailVerificationForm from './EmailVerificationForm';
+import {SWR_KEY} from 'constants/swrKey';
 import SignupInputForm from './SignupInputForm';
+import EmailVerificationForm from './EmailVerificationForm';
 
 type SignupFormProps = {
   navigation: StackNavigationProp<AuthStackParamList>;
 };
 
 const SignupForm = ({navigation}: SignupFormProps) => {
-  const [email, setEmail] = useState<string>('');
+  const {data: auth_verify_email_data} = useSWR(SWR_KEY.auth.verify.email);
+
+  const SignupStepComponent = () => {
+    return auth_verify_email_data ? (
+      <SignupInputForm navigation={navigation} />
+    ) : (
+      <EmailVerificationForm isSignup={true} />
+    );
+  };
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.base}>
-      {!email ? (
-        <EmailVerificationForm onSuccess={(value: string) => setEmail(value)} />
-      ) : (
-        <SignupInputForm email={email} navigation={navigation} />
-      )}
+      {SignupStepComponent()}
     </KeyboardAvoidingView>
   );
 };

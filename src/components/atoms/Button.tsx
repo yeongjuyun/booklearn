@@ -10,12 +10,14 @@ import {
 } from 'react-native';
 import {Colors} from 'constants/theme';
 import Text from './Text';
+import Spinner from './Spinner';
 
 type ButtonProps = {
   children?: ReactNode;
   size?: 's' | 'm' | 'l';
-  disabled?: boolean;
   activeOpacity?: number;
+  disabled?: boolean;
+  isLoading?: boolean;
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
   onPress?: (event: GestureResponderEvent) => void;
@@ -24,8 +26,9 @@ type ButtonProps = {
 function Button({
   children,
   size = 'm',
-  disabled,
   activeOpacity,
+  disabled,
+  isLoading,
   style,
   textStyle,
   onPress,
@@ -45,24 +48,30 @@ function Button({
   let buttonSize = getButtonSize(size);
 
   return (
-    <View style={disabled && styles.disabled}>
+    <View style={(disabled || isLoading) && styles.disabled}>
       <TouchableOpacity
         activeOpacity={activeOpacity || 0.8}
-        disabled={disabled}
+        disabled={disabled || isLoading}
         onPress={onPress}
         {...rest}>
         <View style={[styles.wrapper, buttonSize, style]}>
-          {React.Children.toArray(children).map((child, index) => (
-            <Fragment key={index}>
-              {typeof child === 'string' ? (
-                <Text button style={[styles.text, textStyle]}>
-                  {child}
-                </Text>
-              ) : (
-                <>{child}</>
-              )}
-            </Fragment>
-          ))}
+          {isLoading ? (
+            <Spinner size="small" />
+          ) : (
+            <>
+              {React.Children.toArray(children).map((child, index) => (
+                <Fragment key={index}>
+                  {typeof child === 'string' ? (
+                    <Text button style={[styles.text, textStyle]}>
+                      {child}
+                    </Text>
+                  ) : (
+                    <>{child}</>
+                  )}
+                </Fragment>
+              ))}
+            </>
+          )}
         </View>
       </TouchableOpacity>
     </View>

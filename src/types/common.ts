@@ -11,12 +11,19 @@ export enum ResponseType {
   INITIAL = 'INITIAL',
 }
 
+// [API] 요청
+export type Request = {
+  method: string;
+  url: string;
+  param?: any;
+};
+
 // [API] 응답
 export type Response = {
   type: ResponseType;
   data?: any;
   code: string;
-  message?: string;
+  message: string;
 };
 
 export type AuthType = {

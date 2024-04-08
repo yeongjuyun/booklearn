@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
   View,
@@ -30,30 +30,29 @@ const BookNoteListScreen = ({navigation}: BookNoteListScreenProps) => {
   const [books, setBooks] = useState();
 
   useEffect(() => {
-    const getBookshelf = () => {
-      Api.bookshelf.getBookshelf(undefined, response => {
-        if (response.type === ResponseType.SUCCESS) {
-          setBooks(response.data);
-        }
-      });
-    };
-    const checkLoginStatusAndNavigate = async () => {
-      console.log('navigation-book-main');
+    const unsubscribe = navigation.addListener('focus', async () => {
       try {
         const {accessToken} = await getTokensFromStorage();
-        console.log('accessToken', accessToken);
-        if (accessToken) {
-          console.log('User is logged in.');
-        } else {
+        if (!accessToken) {
           navigation.navigate('Auth');
+        } else {
+          getBookshelf();
         }
       } catch (error) {
         console.log('Error checking login status:', error);
       }
-    };
-    checkLoginStatusAndNavigate();
-    getBookshelf();
+    });
+
+    return unsubscribe;
   }, [navigation]);
+
+  const getBookshelf = () => {
+    Api.bookshelf.getBookshelf(undefined, response => {
+      if (response.type === ResponseType.SUCCESS) {
+        setBooks(response.data);
+      }
+    });
+  };
 
   const headerLeftComponents = (
     <Text>

@@ -3,7 +3,7 @@ import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import Text from 'components/atoms/Text';
 
 type ListItemProps = {
-  title: string;
+  title?: string;
   caption?: string;
   avatarUrl?: string;
   startContent?: ReactNode;

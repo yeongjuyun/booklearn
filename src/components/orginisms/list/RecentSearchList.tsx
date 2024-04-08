@@ -5,6 +5,8 @@ import {
   View,
   useColorScheme,
 } from 'react-native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {BookStackParamList} from 'types/navigation';
 import {Colors} from 'constants/theme';
 import Icon from 'components/atoms/Icon';
 import Text from 'components/atoms/Text';

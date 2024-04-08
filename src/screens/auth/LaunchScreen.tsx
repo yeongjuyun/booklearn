@@ -2,6 +2,7 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {Image, StyleSheet, View} from 'react-native';
 import {AuthStackParamList} from 'types/navigation';
 import YogaImage from 'assets/image/yoga.png';
+import BookImage from 'assets/image/books2.png';
 import {Colors} from 'constants/theme';
 import Button from 'components/atoms/Button';
 import Text from 'components/atoms/Text';
@@ -26,7 +27,8 @@ const LaunchScreen = ({navigation}: LaunchScreenProps) => {
           </Text>
         </View>
       </View>
-      <Image source={YogaImage} style={styles.image} />
+      <Image source={BookImage} style={styles.image} />
+      {/* <Image source={YogaImage} style={styles.image} /> */}
       <Button
         activeOpacity={1}
         textStyle={styles.buttonText}
@@ -63,6 +65,11 @@ const styles = StyleSheet.create({
   },
   descriptionText: {},
   image: {
+    width: 400,
+    height: 400,
+    alignSelf: 'center',
+  },
+  fullImage: {
     position: 'absolute',
     right: -85,
     bottom: 0,

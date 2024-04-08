@@ -1,25 +1,55 @@
 import React, {FC, useRef, useState} from 'react';
 import {View, StyleSheet} from 'react-native';
+import useSWR from 'swr';
+import Api from 'libs/axios/api';
+import {ResponseType} from 'types/common';
+import {SWR_KEY} from 'constants/swrKey';
 import {Colors} from 'constants/theme';
 import Input from 'components/atoms/Input';
 import Button from 'components/atoms/Button';
 import Timer from 'components/atoms/Timer';
-import Api from 'libs/axios/api';
 
 type EmailVerificationFormProps = {
-  onSuccess: (email: string) => void;
+  isSignup: boolean;
+  onSuccessEmailVerification?: () => void;
 };
 
 const EmailVerificationForm: FC<EmailVerificationFormProps> = ({
-  onSuccess,
+  isSignup,
+  onSuccessEmailVerification,
 }: EmailVerificationFormProps) => {
+  const {mutate: auth_verify_email_mutate} = useSWR(SWR_KEY.auth.verify.email);
+
   const [inputs, setInputs] = useState({email: '', code: ''});
   const [errorTexts, setErrorTexts] = useState({email: '', code: ''});
   const [isSend, setIsSend] = useState<boolean>(false);
-  const isValidEmailInput = inputs.email.length > 0;
   const timerRef = useRef<any>(null);
 
-  const handlePressSendVerificationCode = () => {
+  const [isLoadingSendEmail, setIsLoadingSendEmail] = useState<boolean>(false);
+  const [isLoadingVerifyEmail, setIsLoadingVerifyEmail] =
+    useState<boolean>(false);
+
+  const isValidEmailInput = inputs.email.length > 0;
+
+  const sendEmailVerificationCode = async (onSuccess: () => void) => {
+    setIsLoadingSendEmail(true);
+
+    const payload = {email: inputs.email, isSignUp: isSignup};
+    await Api.auth.sendEmailVerificationCode(payload, response => {
+      if (response.type === ResponseType.SUCCESS) {
+        onSuccess();
+      } else {
+        setErrorTexts({
+          ...errorTexts,
+          email: response.message,
+        });
+      }
+
+      setIsLoadingSendEmail(false);
+    });
+  };
+
+  const handlePressSendVerificationCode = async () => {
     const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
     if (!emailPattern.test(inputs.email)) {
       return setErrorTexts({
@@ -28,24 +58,32 @@ const EmailVerificationForm: FC<EmailVerificationFormProps> = ({
       });
     }
 
-    console.log(inputs.email);
-    setIsSend(true);
+    sendEmailVerificationCode(() => setIsSend(true));
   };
 
   const handlePressResendVerificationCode = () => {
-    console.log('Resend', inputs.email);
-    timerRef.current?.restart();
+    sendEmailVerificationCode(() => timerRef.current?.restart());
   };
 
   const handleSubmitVerificationCode = async () => {
-    console.log(inputs);
-    onSuccess(inputs.email);
+    setIsLoadingVerifyEmail(true);
 
-    // await Api.login(inputs, async (response: Response) => {
-    //   const { refreshToken, accessToken } = response.data;
-    //   await saveTokensToStorage(refreshToken, accessToken);
-    //   setInputs({ email: '', password: '' });
-    // });
+    const payload = {email: inputs.email, code: inputs.code};
+    Api.auth.verifyEmailVerificationCode(payload, response => {
+      if (response.type === ResponseType.SUCCESS) {
+        auth_verify_email_mutate(inputs.email);
+        if (onSuccessEmailVerification) {
+          onSuccessEmailVerification();
+        }
+      } else {
+        setErrorTexts({
+          ...errorTexts,
+          code: response.message,
+        });
+      }
+
+      setIsLoadingVerifyEmail(false);
+    });
   };
 
   return (
@@ -60,8 +98,10 @@ const EmailVerificationForm: FC<EmailVerificationFormProps> = ({
           blurOnSubmit={false}
           isDisabled={isSend}
           errorText={errorTexts.email}
-          onChangeText={value => setInputs({...inputs, email: value})}
-          onTextInput={() => setErrorTexts({...errorTexts, email: ''})}
+          onChangeText={value => {
+            setInputs({...inputs, email: value});
+            setErrorTexts({...errorTexts, email: ''});
+          }}
           onSubmitEditing={handlePressSendVerificationCode}
         />
         {isSend && (
@@ -74,7 +114,11 @@ const EmailVerificationForm: FC<EmailVerificationFormProps> = ({
             endContent={
               <Timer ref={timerRef} duration={300000} autoStart={isSend} />
             }
-            onChangeText={value => setInputs({...inputs, code: value})}
+            errorText={errorTexts.code}
+            onChangeText={value => {
+              setInputs({...inputs, code: value});
+              setErrorTexts({...errorTexts, code: ''});
+            }}
             onSubmitEditing={handleSubmitVerificationCode}
           />
         )}
@@ -84,6 +128,7 @@ const EmailVerificationForm: FC<EmailVerificationFormProps> = ({
           <Button
             size="l"
             disabled={!isValidEmailInput}
+            isLoading={isLoadingSendEmail}
             style={styles.verificationButton}
             onPress={handlePressSendVerificationCode}>
             인증코드 발송
@@ -95,12 +140,14 @@ const EmailVerificationForm: FC<EmailVerificationFormProps> = ({
               textStyle={{color: Colors.primary}}
               style={styles.resendButton}
               disabled={!isValidEmailInput}
+              isLoading={isLoadingSendEmail}
               onPress={handlePressResendVerificationCode}>
               인증코드 재전송
             </Button>
             <Button
               size="l"
               disabled={!(isValidEmailInput && inputs.code.length > 0)}
+              isLoading={isLoadingVerifyEmail}
               style={styles.verificationButton}
               onPress={handleSubmitVerificationCode}>
               인증하기

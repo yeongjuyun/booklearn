@@ -12,6 +12,7 @@ import Api from 'libs/axios/api';
 import {ResponseType} from 'types/common';
 import {BookStackParamList} from 'types/navigation';
 import {Colors} from 'constants/theme';
+import {formatDateTime} from 'utls/date';
 import Text from 'components/atoms/Text';
 import Icon from 'components/atoms/Icon';
 import Input from 'components/atoms/Input';
@@ -56,26 +57,41 @@ function BookMemoEditScreen({navigation}: BookMemoEditScreenProps) {
     }
   };
 
-  const handlePressCancel = () => {
-    navigation.navigate('Detail', {id: inputs.bookId});
-  };
-
   const handlePressDelete = () => {
+    // TODO: 메모삭제
     navigation.navigate('Detail', {id: inputs.bookId});
   };
 
   const handlePressRemoveMemo = () => {
     Alert.alert('', '메모를 삭제하시겠습니까?', [
-      {text: '취소', style: 'cancel', onPress: handlePressCancel},
+      {text: '취소', style: 'cancel'},
       {text: '삭제', style: 'destructive', onPress: handlePressDelete},
     ]);
+  };
+
+  const handlePressClose = () => {
+    if (
+      inputs.page !== route.params?.bookMemo.page.toString() ||
+      inputs.content !== route.params?.bookMemo.content
+    ) {
+      Alert.alert(
+        '',
+        '작성중인 내용이 저장되지 않았습니다. \n 작성을 취소하시겠습니까?',
+        [
+          {text: '취소', style: 'cancel'},
+          {text: '확인', onPress: () => navigation.goBack()},
+        ],
+      );
+    } else {
+      navigation.goBack();
+    }
   };
 
   return (
     <DefaultLayout
       headerTitle="메모 작성"
       headerLeftContent={
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={handlePressClose}>
           <Text body>닫기</Text>
         </TouchableOpacity>
       }
@@ -104,14 +120,15 @@ function BookMemoEditScreen({navigation}: BookMemoEditScreenProps) {
             }
             onChangeText={text => setInputs({...inputs, page: text})}
           />
-          <View style={styles.iconWrapper}>
+          {/* TODO: 사진촬영, 갤러리 이미지 업로드 */}
+          {/* <View style={styles.iconWrapper}>
             <TouchableOpacity>
               <Icon name="camera" size={28} />
             </TouchableOpacity>
             <TouchableOpacity>
               <Icon name="gallery" size={28} />
             </TouchableOpacity>
-          </View>
+          </View> */}
         </View>
         <Input
           placeholder="메모 내용을 입력해주세요"
@@ -122,12 +139,20 @@ function BookMemoEditScreen({navigation}: BookMemoEditScreenProps) {
           onChangeText={text => setInputs({...inputs, content: text})}
         />
         <View style={styles.footerWrapper}>
-          <TouchableOpacity activeOpacity={0.8} onPress={handlePressRemoveMemo}>
-            <Text caption style={{color: errorColor}}>
-              메모 삭제
-            </Text>
-          </TouchableOpacity>
-          <Text caption>작성일: {inputs.createdAt}</Text>
+          {inputs.id && (
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={handlePressRemoveMemo}>
+              <Text caption style={{color: errorColor}}>
+                메모 삭제
+              </Text>
+            </TouchableOpacity>
+          )}
+          <Text caption>
+            {inputs.createdAt
+              ? `작성일: ${formatDateTime(inputs.createdAt, 'date')}`
+              : ''}
+          </Text>
         </View>
       </View>
     </DefaultLayout>

@@ -1,5 +1,6 @@
 import {useRef, useState} from 'react';
 import {
+  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -10,10 +11,13 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import Button from 'components/atoms/Button';
-import {Colors} from 'constants/theme';
 import {StackNavigationProp} from '@react-navigation/stack';
+import {saveTokensToStorage} from 'libs/async-storage';
+import Api from 'libs/axios/api';
+import {ResponseType} from 'types/common';
 import {AuthStackParamList, RootStackParamList} from 'types/navigation';
+import {Colors} from 'constants/theme';
+import Button from 'components/atoms/Button';
 import Input from 'components/atoms/Input';
 import Text from 'components/atoms/Text';
 
@@ -24,17 +28,25 @@ type SigninFormProps = {
 const SigninForm = ({navigation}: SigninFormProps) => {
   const passwordRef = useRef<TextInput>(null);
   const [inputs, setInputs] = useState({email: '', password: ''});
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const isValidForm = inputs.email.length > 0 && inputs.password.length > 0;
 
   const handleSubmit = async () => {
-    console.log(inputs);
-    navigation.navigate('Home');
+    setIsLoading(true);
 
-    // await Api.login(inputs, async (response: Response) => {
-    //   const { refreshToken, accessToken } = response.data;
-    //   await saveTokensToStorage(refreshToken, accessToken);
-    //   setInputs({ email: '', password: '' });
-    //   navigation.navigate('Main');
-    // });
+    const payload = {email: inputs.email, password: inputs.password};
+    await Api.auth.signinWithLocal(payload, response => {
+      if (response.type === ResponseType.SUCCESS) {
+        const {accessToken, refreshToken} = response.data;
+        saveTokensToStorage(accessToken, refreshToken);
+        setInputs({email: '', password: ''});
+        navigation.navigate('Home');
+      } else {
+        Alert.alert('로그인 실패', response.message, [{text: '확인'}]);
+      }
+
+      setIsLoading(false);
+    });
   };
 
   return (
@@ -79,10 +91,9 @@ const SigninForm = ({navigation}: SigninFormProps) => {
             <Button
               size="l"
               style={styles.signinButton}
-              onPress={handleSubmit}
-              disabled={
-                !(inputs.email.length > 0 && inputs.password.length > 0)
-              }>
+              disabled={!isValidForm}
+              isLoading={isLoading}
+              onPress={handleSubmit}>
               로그인
             </Button>
           </View>

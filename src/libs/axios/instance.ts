@@ -1,20 +1,19 @@
-import axios, {AxiosResponse} from 'axios';
-import {Response, ResponseType} from 'types/common';
-import {Alert, ToastAndroid} from 'react-native';
-// import { getTokensFromStorage, removeTokensFromStorage } from '../utils/auth';
-// import { saveAccessTokenToStorage } from '../utils/auth';
+import {Alert} from 'react-native';
 import {StackNavigationProp} from '@react-navigation/stack';
+import axios, {AxiosResponse} from 'axios';
+import {Fetcher} from 'swr';
 import {
   getTokensFromStorage,
   removeTokensFromStorage,
   saveAccessTokenToStorage,
 } from 'libs/async-storage';
+import {Request, Response, ResponseType} from 'types/common';
 
 export const BASE_URL = 'https://api.book-worm.co.kr';
 
 export const instance = axios.create({
   baseURL: BASE_URL,
-  timeout: 3000,
+  timeout: 10000,
   withCredentials: true,
 });
 // 요청 인터셉터
@@ -37,27 +36,27 @@ instance.interceptors.response.use(
     const originalRequest = response.config;
     const {refreshToken} = await getTokensFromStorage();
     let _response = response;
-    if (response.data.resultCode === '010') {
-      const result = await axios
-        .get(`${BASE_URL}/auth`, {
-          headers: {Authorization: `Bearer ${refreshToken}`},
-        })
-        .then(async res => {
-          const newAccessToken = res.data.resultBody.accessToken;
-          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-          saveAccessTokenToStorage(newAccessToken);
-          return await instance(originalRequest);
-        })
-        .catch(async err => {
-          console.log('err', err);
-          console.log('토큰 재발급 중 에러 발생', err.response.headers);
-          await removeTokensFromStorage();
-        });
+    // if (response.data.resultCode === '99999') {
+    //   const result = await axios
+    //     .get(`${BASE_URL}/auth`, {
+    //       headers: {Authorization: `Bearer ${refreshToken}`},
+    //     })
+    //     .then(async res => {
+    //       const newAccessToken = res.data.resultBody.accessToken;
+    //       originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+    //       saveAccessTokenToStorage(newAccessToken);
+    //       return await instance(originalRequest);
+    //     })
+    //     .catch(async err => {
+    //       console.log('err', err);
+    //       console.log('토큰 재발급 중 에러 발생', err.response.headers);
+    //       await removeTokensFromStorage();
+    //     });
 
-      if (result) {
-        _response = result as AxiosResponse<any, any>;
-      }
-    }
+    //   if (result) {
+    //     _response = result as AxiosResponse<any, any>;
+    //   }
+    // }
     return _response;
   },
   error => {
@@ -94,12 +93,13 @@ instance.interceptors.response.use(
 
 export const GET = async (
   url: string,
-  onSuccess?: (response: Response) => void,
+  callback?: (response: Response) => void,
   navigation?: StackNavigationProp<any>,
 ) => {
   const response: Response = {
     type: ResponseType.FAILURE,
     code: '99999',
+    message: '',
   };
 
   try {
@@ -109,10 +109,10 @@ export const GET = async (
     response.type = type;
     response.code = code;
     response.data = data;
-    response.message = message;
+    response.message = message || '요청 실패';
 
-    if (typeof onSuccess === 'function') {
-      onSuccess(response);
+    if (typeof callback === 'function') {
+      callback(response);
     }
   } catch (error) {
     response.message = `요청실패: ${error}`;
@@ -123,25 +123,26 @@ export const GET = async (
 export const POST = async (
   url: string,
   payload: any,
-  onSuccess?: (response: Response) => void,
+  callback?: (response: Response) => void,
   navigation?: StackNavigationProp<any>,
 ) => {
   const response: Response = {
     type: ResponseType.FAILURE,
-    code: '010',
+    code: '99999',
+    message: '',
   };
 
   try {
     const res = await instance.post(url, payload);
+    console.log('res', res);
     const {type, code, data, message} = res.data;
 
     response.type = type;
     response.code = code;
     response.data = data;
-    response.message = message;
-    // checkResultCode(response, navigation);
-    if (typeof onSuccess === 'function') {
-      onSuccess(response);
+    response.message = message || '요청 실패';
+    if (typeof callback === 'function') {
+      callback(response);
     }
   } catch (error) {
     response.message = `요청실패: ${error}`;
@@ -149,46 +150,40 @@ export const POST = async (
   }
 };
 
-// export const checkResultCode = (response: Response, navigation?: StackNavigationProp<any>) => {
-//   switch (response.code) {
-//     case ErrorCodeType.LOGIN_EXPIRE: {
-//       response.type = ResponseType.FAILURE;
-//       ToastAndroid.show('로그인 정보가 만료되었습니다.', ToastAndroid.SHORT);
-//       //   navigation && navigation.navigate(RootNavigation.LOGIN);
-//       break;
-//     }
-//     case ErrorCodeType.SIGNUP_FAILURE: {
-//       response.type = ResponseType.FAILURE;
-//       ToastAndroid.show('이미 가입된 아이디입니다.', ToastAndroid.SHORT);
-//       break;
-//     }
-//     case ErrorCodeType.INVALID_ID: {
-//       response.type = ResponseType.FAILURE;
-//       ToastAndroid.show('로그인 정보가 올바르지 않습니다.', ToastAndroid.SHORT);
-//       break;
-//     }
-//     case ErrorCodeType.INVALID_PASSWORD: {
-//       response.type = ResponseType.FAILURE;
-//       ToastAndroid.show('비밀번호가 올바르지 않습니다.', ToastAndroid.SHORT);
-//       break;
-//     }
-//     // inference
-//     case ErrorCodeType.INFERENCE_FAILURE: {
-//       response.type = ResponseType.FAILURE;
-//       ToastAndroid.show('사진 분석이 실패했습니다.', ToastAndroid.SHORT);
-//       break;
-//     }
-//     // history
-//     case ErrorCodeType.HISTORY_FAILURE: {
-//       response.type = ResponseType.FAILURE;
-//       ToastAndroid.show('히스토리 조회에 실패했습니다.', ToastAndroid.SHORT);
-//       break;
-//     }
-//     // history/detail
-//     case ErrorCodeType.HISTORY_DETAIL_FAILURE: {
-//       response.type = ResponseType.FAILURE;
-//       ToastAndroid.show('상세정보 조회에 실패했습니다.', ToastAndroid.SHORT);
-//       break;
-//     }
-//   }
-// };
+export const DELETE = async (
+  url: string,
+  payload: any,
+  callback?: (response: Response) => void,
+  navigation?: StackNavigationProp<any>,
+) => {
+  const response: Response = {
+    type: ResponseType.FAILURE,
+    code: '99999',
+    message: '',
+  };
+
+  try {
+    const res = await instance.delete(url, payload);
+    const {type, code, data, message} = res.data;
+
+    response.type = type;
+    response.code = code;
+    response.data = data;
+    response.message = message || '요청 실패';
+    if (typeof callback === 'function') {
+      callback(response);
+    }
+  } catch (error) {
+    response.message = `요청실패: ${error}`;
+  } finally {
+  }
+};
+
+export const fetcher = <T = any>(): Fetcher<T, Request> => {
+  return (payload: Request) =>
+    instance({
+      method: payload.method,
+      url: payload.url,
+      data: payload.param,
+    }).then(res => res.data.data);
+};
