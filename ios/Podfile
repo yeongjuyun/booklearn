@@ -1,6 +1,3 @@
-# Google Login 모듈 헤더 사용
-use_modular_headers!
-
 # Resolve react_native_pods.rb with node to allow for hoisting
 require Pod::Executable.execute_command('node', ['-p',
   'require.resolve(
@@ -34,7 +31,9 @@ target 'booklearn' do
   config = use_native_modules!
 
   use_react_native!(
+    
     :path => config[:reactNativePath],
+    
     # Enables Flipper.
     #
     # Note that if you have use_frameworks! enabled, Flipper will not work and
@@ -42,7 +41,13 @@ target 'booklearn' do
     # :flipper_configuration => flipper_config,
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
-  )
+    )
+
+    # Google Login 모듈 헤더 사용
+    pod 'Firebase', :modular_headers => true
+    pod 'FirebaseCoreInternal', :modular_headers => true
+    pod 'GoogleUtilities', :modular_headers => true
+    pod 'FirebaseCore', :modular_headers => true
 
   target 'booklearnTests' do
     inherit! :complete

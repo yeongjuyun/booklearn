@@ -1,6 +1,6 @@
-import {useState} from 'react';
 import {
   Alert,
+  Pressable,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -11,10 +11,10 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import Api from 'libs/axios/api';
 import {ResponseType} from 'types/common';
 import {BookStackParamList} from 'types/navigation';
-import {Colors} from 'constants/theme';
-import {formatDateTime} from 'utls/date';
+import {Colors, HIT_SLOP} from 'constants/theme';
+import {formatDateTime} from 'utils/date';
+import useInputs from 'hooks/useInputs';
 import Text from 'components/atoms/Text';
-import Icon from 'components/atoms/Icon';
 import Input from 'components/atoms/Input';
 import DefaultLayout from 'layouts/DefaultLayout';
 
@@ -26,40 +26,73 @@ type BookMemoEditScreenRouteProp = RouteProp<BookStackParamList, 'EditMemo'>;
 
 function BookMemoEditScreen({navigation}: BookMemoEditScreenProps) {
   const route = useRoute<BookMemoEditScreenRouteProp>();
-  const [inputs, setInputs] = useState({
-    bookId: route.params?.id || '',
-    id: route.params?.bookMemo.id || '',
-    page: route.params?.bookMemo.page.toString() ?? '',
-    content: route.params?.bookMemo.content || '',
-    createdAt: route.params?.bookMemo.createdAt || '',
-  });
 
   const isDarkMode = useColorScheme() === 'dark';
   const errorColor = isDarkMode ? Colors.dark.error : Colors.light.error;
 
+  const {values, handleChange} = useInputs({
+    id: route.params?.id || '',
+    memoId: route.params?.bookMemo.id || '',
+    page: route.params?.bookMemo.page.toString() ?? '',
+    content: route.params?.bookMemo.content || '',
+    createdAt: route.params?.bookMemo.createdAt || '',
+    updatedAt: route.params?.bookMemo.updatedAt || '',
+  });
+
+  const createBookMemo = () => {
+    const payload = {
+      bookshelfId: values.id,
+      page: Number(values.page),
+      content: values.content,
+    };
+
+    Api.bookshelf.postBookMemo(payload, response => {
+      if (response.type === ResponseType.SUCCESS) {
+        navigation.navigate('Detail', {id: values.id});
+      } else {
+        Alert.alert('메모 추가 실패', response.message, [{text: '확인'}]);
+      }
+    });
+  };
+
+  const updateBookMemo = () => {
+    const payload = {
+      bookshelfId: values.id,
+      memoId: values.memoId,
+      page: Number(values.page),
+      content: values.content,
+    };
+
+    Api.bookshelf.patchBookMemo(payload, response => {
+      if (response.type === ResponseType.SUCCESS) {
+        navigation.navigate('Detail', {id: values.id});
+      } else {
+        Alert.alert('메모 수정 실패', response.message, [{text: '확인'}]);
+      }
+    });
+  };
+
+  const deleteBookMemo = () => {
+    const payload = {bookshelfId: values.id, memoId: values.memoId};
+    Api.bookshelf.deleteBookMemoById(payload, response => {
+      if (response.type === ResponseType.SUCCESS) {
+        navigation.navigate('Detail', {id: values.id});
+      } else {
+        Alert.alert('메모 삭제 실패', response.message, [{text: '확인'}]);
+      }
+    });
+  };
+
   const handleSubmitMemo = () => {
-    console.log('submit', inputs);
-    if (inputs.id) {
-      // Edit
+    if (values.memoId) {
+      updateBookMemo();
     } else {
-      // New
-      const payload = {
-        // TODO: id 값 API 수정되면 반영 필요
-        id: inputs.bookId,
-        page: Number(inputs.page),
-        content: inputs.content,
-      };
-      Api.bookshelf.postBookMemo(payload, response => {
-        if (response.type === ResponseType.SUCCESS) {
-          navigation.navigate('Detail', {id: inputs.bookId});
-        }
-      });
+      createBookMemo();
     }
   };
 
   const handlePressDelete = () => {
-    // TODO: 메모삭제
-    navigation.navigate('Detail', {id: inputs.bookId});
+    deleteBookMemo();
   };
 
   const handlePressRemoveMemo = () => {
@@ -71,8 +104,8 @@ function BookMemoEditScreen({navigation}: BookMemoEditScreenProps) {
 
   const handlePressClose = () => {
     if (
-      inputs.page !== route.params?.bookMemo.page.toString() ||
-      inputs.content !== route.params?.bookMemo.content
+      values.page !== route.params?.bookMemo.page.toString() ||
+      values.content !== route.params?.bookMemo.content
     ) {
       Alert.alert(
         '',
@@ -89,11 +122,11 @@ function BookMemoEditScreen({navigation}: BookMemoEditScreenProps) {
 
   return (
     <DefaultLayout
-      headerTitle="메모 작성"
+      headerTitle={values.memoId ? '메모 수정' : '메모 작성'}
       headerLeftContent={
-        <TouchableOpacity onPress={handlePressClose}>
+        <Pressable hitSlop={HIT_SLOP} onPress={handlePressClose}>
           <Text body>닫기</Text>
-        </TouchableOpacity>
+        </Pressable>
       }
       headerRightContent={
         <TouchableOpacity onPress={handleSubmitMemo}>
@@ -110,7 +143,7 @@ function BookMemoEditScreen({navigation}: BookMemoEditScreenProps) {
           <Input
             keyboardType="number-pad"
             placeholder="페이지"
-            value={inputs.page === '0' ? '' : inputs.page}
+            value={values.page === '0' ? '' : values.page}
             maxLength={5}
             style={styles.input}
             startContent={
@@ -118,7 +151,7 @@ function BookMemoEditScreen({navigation}: BookMemoEditScreenProps) {
                 P.
               </Text>
             }
-            onChangeText={text => setInputs({...inputs, page: text})}
+            onChangeText={text => handleChange('page', text)}
           />
           {/* TODO: 사진촬영, 갤러리 이미지 업로드 */}
           {/* <View style={styles.iconWrapper}>
@@ -132,14 +165,15 @@ function BookMemoEditScreen({navigation}: BookMemoEditScreenProps) {
         </View>
         <Input
           placeholder="메모 내용을 입력해주세요"
-          value={inputs.content}
+          value={values.content}
+          maxLength={1000}
           multiline
           autoFocus
           style={styles.textarea}
-          onChangeText={text => setInputs({...inputs, content: text})}
+          onChangeText={text => handleChange('content', text)}
         />
         <View style={styles.footerWrapper}>
-          {inputs.id && (
+          {values.memoId && (
             <TouchableOpacity
               activeOpacity={0.8}
               onPress={handlePressRemoveMemo}>
@@ -149,8 +183,8 @@ function BookMemoEditScreen({navigation}: BookMemoEditScreenProps) {
             </TouchableOpacity>
           )}
           <Text caption>
-            {inputs.createdAt
-              ? `작성일: ${formatDateTime(inputs.createdAt, 'date')}`
+            {values.createdAt
+              ? `작성일: ${formatDateTime(values.createdAt, 'date')}`
               : ''}
           </Text>
         </View>

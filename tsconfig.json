@@ -10,7 +10,9 @@
       "@layouts/*": ["src/layouts/*"],
       "@types/*": ["src/types/*"],
       "@constants/*": ["src/constants/*"],
-      "@asset/*": ["src/asset/*"]
+      "@asset/*": ["src/asset/*"],
+      "@utils/*": ["src/utils/*"],
+      "@hooks/*": ["src/hooks/*"]
     }
   }
 }

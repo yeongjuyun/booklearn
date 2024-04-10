@@ -5,20 +5,8 @@ export enum MemoSortType {
   PAGE_DESC = '페이지역순',
 }
 
-export type BookMemo = {
-  id: string;
-  page: number;
-  content: string;
-  createdAt: string;
-};
-
-export type BookEssay = {
-  id: string;
-  content: string;
-  createdAt: string;
-};
-
 export type Book = {
+  bookshelfId: string;
   id: string;
   isbn: string;
   title: string;
@@ -27,4 +15,21 @@ export type Book = {
   publisher: string;
   memoList: Array<BookMemo>;
   essay: BookEssay;
+};
+
+export type BookMemo = {
+  id: string;
+  bookshelfId: string;
+  page: number;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type BookEssay = {
+  id: string;
+  bookshelfId: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
 };

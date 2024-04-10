@@ -1,11 +1,17 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, TouchableOpacity, View, useColorScheme} from 'react-native';
+import {
+  Pressable,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  useColorScheme,
+} from 'react-native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Api from 'libs/axios/api';
 import {BookStackParamList} from 'types/navigation';
 import {ResponseType} from 'types/common';
-import {Colors} from 'constants/theme';
+import {Colors, HIT_SLOP} from 'constants/theme';
 import Divider from 'components/atoms/Divider';
 import Icon from 'components/atoms/Icon';
 import SearchInput from 'components/atoms/SearchInput';
@@ -98,9 +104,9 @@ const BookSearchScreen = ({navigation}: BookSearchScreenProps) => {
   return (
     <DefaultLayout
       headerLeftContent={
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Pressable hitSlop={HIT_SLOP} onPress={() => navigation.goBack()}>
           <Icon name="arrow_back" size={20} />
-        </TouchableOpacity>
+        </Pressable>
       }
       headerRightContent={
         <SearchInput

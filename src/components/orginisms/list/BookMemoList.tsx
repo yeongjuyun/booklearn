@@ -1,9 +1,15 @@
-import {StyleSheet, TouchableOpacity, View, useColorScheme} from 'react-native';
+import {
+  Pressable,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  useColorScheme,
+} from 'react-native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {BookStackParamList} from 'types/navigation';
 import {BookMemo} from 'types/book';
-import {Colors} from 'constants/theme';
-import {formatDateTime} from 'utls/date';
+import {Colors, HIT_SLOP} from 'constants/theme';
+import {formatDateTime} from 'utils/date';
 import Divider from 'components/atoms/Divider';
 import Chip from 'components/atoms/Chip';
 import Icon from 'components/atoms/Icon';
@@ -29,13 +35,16 @@ const BookMemoList = ({navigation, data, bookId}: BookMemoListProps) => {
             <Chip>{item.page ? `P. ${item.page}` : '미지정'}</Chip>
             <View style={styles.itemHeaderLeft}>
               <Text caption>{formatDateTime(item.createdAt, 'date')}</Text>
-              <TouchableOpacity
-                activeOpacity={0.8}
+              <Pressable
+                hitSlop={HIT_SLOP}
                 onPress={() =>
-                  navigation.navigate('EditMemo', {id: bookId, bookMemo: item})
+                  navigation.navigate('EditMemo', {
+                    id: item.bookshelfId,
+                    bookMemo: item,
+                  })
                 }>
                 <Icon name="edit" size={16} color={neutralColor} />
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
           <Text body numberOfLines={1000}>

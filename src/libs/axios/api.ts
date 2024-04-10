@@ -2,7 +2,7 @@ import * as KakaoLogin from '@react-native-seoul/kakao-login';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {saveTokensToStorage} from 'libs/async-storage';
 import {Response, ResponseType} from 'types/common';
-import {DELETE, GET, POST} from './instance';
+import {DELETE, GET, POST, UPDATE} from './instance';
 
 GoogleSignin.configure({
   webClientId:
@@ -18,7 +18,6 @@ const authApis = {
     const kakaoLoginResponse = await KakaoLogin.login();
     const {accessToken} = kakaoLoginResponse;
     await POST('/users/sign-in/kakao', {accessToken}, (response: Response) => {
-      console.log('kakao-response', response);
       if (response.type === ResponseType.SUCCESS) {
         const {accessToken, refreshToken} = response.data;
         saveTokensToStorage(accessToken, refreshToken);
@@ -33,14 +32,22 @@ const authApis = {
     callback?: (response: Response) => void,
     navigation?: any,
   ) => {
-    await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
-    const {idToken} = await GoogleSignin.signIn();
-    console.log('idToken', idToken);
-
-    if (idToken) {
-      POST('/users/sign-in/google', {accessToken: idToken}, response => {
-        console.log('response', response);
+    try {
+      await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
+      const {
+        user: {id, email},
+      } = await GoogleSignin.signIn();
+      POST('/users/sign-in/google', {id, email}, response => {
+        if (response.type === ResponseType.SUCCESS) {
+          const {accessToken, refreshToken} = response.data;
+          saveTokensToStorage(accessToken, refreshToken);
+          navigation.navigate('Home');
+        } else {
+          console.log('구글 로그인 실패');
+        }
       });
+    } catch (error) {
+      console.log(error);
     }
   },
   signinWithLocal: async (
@@ -80,20 +87,65 @@ const authApis = {
   },
 };
 
+const defaultApis = {
+  getTermsOfService: async (
+    payload?: {},
+    callback?: (response: Response) => void,
+    navigation?: any,
+  ) => {
+    await GET('/terms-of-service', callback, navigation);
+  },
+  getPrivacyPolicy: async (
+    payload?: {},
+    callback?: (response: Response) => void,
+    navigation?: any,
+  ) => {
+    await GET('/privacy-policy', callback, navigation);
+  },
+  getReleaseNotes: async (
+    payload?: {},
+    callback?: (response: Response) => void,
+    navigation?: any,
+  ) => {
+    await GET('/release-notes', callback, navigation);
+  },
+  getAppVersions: async (
+    payload?: {},
+    callback?: (response: Response) => void,
+    navigation?: any,
+  ) => {
+    await GET('/app-versions', callback, navigation);
+  },
+};
+
 const userApis = {
+  getUser: async (
+    payload?: {},
+    callback?: (response: Response) => void,
+    navigation?: any,
+  ) => {
+    await GET('/auth/me', callback, navigation);
+  },
   updateNickname: async (
     payload: {name: string},
     callback?: (response: Response) => void,
     navigation?: any,
   ) => {
-    await POST('/users/name', payload, callback, navigation);
+    await UPDATE('/users/name', payload, callback, navigation);
   },
   updatePassword: async (
     payload: {password: string},
     callback?: (response: Response) => void,
     navigation?: any,
   ) => {
-    await POST('/users/password', payload, callback, navigation);
+    await UPDATE('/users/password', payload, callback, navigation);
+  },
+  deleteUser: async (
+    payload?: {},
+    callback?: (response: Response) => void,
+    navigation?: any,
+  ) => {
+    await DELETE('/users', undefined, callback, navigation);
   },
 };
 
@@ -158,28 +210,82 @@ const bookshelfApis = {
     await POST('/bookshelf', payload, callback, navigation);
   },
   getBookshelfById: async (
-    payload: {id: string},
+    payload: {bookshelfId: string},
     callback?: (response: Response) => void,
     navigation?: any,
   ) => {
-    const {id} = payload;
-    await GET(`/bookshelf/${id}`, callback, navigation);
+    const {bookshelfId} = payload;
+    await GET(`/bookshelf/${bookshelfId}`, callback, navigation);
   },
   postBookEssay: async (
-    payload: {id: string; content: string},
+    payload: {bookshelfId: string; content: string},
     callback?: (response: Response) => void,
     navigation?: any,
   ) => {
-    const {id, content} = payload;
-    await POST(`/bookshelf/${id}/essay`, {content}, callback, navigation);
+    const {bookshelfId, content} = payload;
+    await POST(
+      `/bookshelf/${bookshelfId}/essay`,
+      {content},
+      callback,
+      navigation,
+    );
   },
   postBookMemo: async (
-    payload: {id: string; page: number; content: string},
+    payload: {bookshelfId: string; page: number; content: string},
     callback?: (response: Response) => void,
     navigation?: any,
   ) => {
-    const {id, page, content} = payload;
-    await POST(`/bookshelf/${id}/memo`, {page, content}, callback, navigation);
+    const {bookshelfId, page, content} = payload;
+    await POST(
+      `/bookshelf/${bookshelfId}/memo`,
+      {page, content},
+      callback,
+      navigation,
+    );
+  },
+  patchBookMemo: async (
+    payload: {
+      bookshelfId: string;
+      memoId: string;
+      page: number;
+      content: string;
+    },
+    callback?: (response: Response) => void,
+    navigation?: any,
+  ) => {
+    const {bookshelfId, memoId, ...requestBody} = payload;
+    await UPDATE(
+      `/bookshelf/${bookshelfId}/memo/${memoId}`,
+      requestBody,
+      callback,
+      navigation,
+    );
+  },
+  patchBookEssay: async (
+    payload: {bookshelfId: string; essayId: string; content: string},
+    callback?: (response: Response) => void,
+    navigation?: any,
+  ) => {
+    const {bookshelfId, essayId, ...requestBody} = payload;
+    await UPDATE(
+      `/bookshelf/${bookshelfId}/essay/${essayId}`,
+      requestBody,
+      callback,
+      navigation,
+    );
+  },
+  deleteBookMemoById: async (
+    payload: {bookshelfId: string; memoId: string},
+    callback?: (response: Response) => void,
+    navigation?: any,
+  ) => {
+    const {bookshelfId, memoId} = payload;
+    await DELETE(
+      `/bookshelf/${bookshelfId}/memo/${memoId}`,
+      {},
+      callback,
+      navigation,
+    );
   },
   deleteBookshelfById: async (
     payload: {id: string},
@@ -189,9 +295,23 @@ const bookshelfApis = {
     const {id} = payload;
     await DELETE(`/bookshelf/${id}`, {}, callback, navigation);
   },
+  deleteBookEssayById: async (
+    payload: {bookshelfId: string; essayId: string},
+    callback?: (response: Response) => void,
+    navigation?: any,
+  ) => {
+    const {bookshelfId, essayId} = payload;
+    await DELETE(
+      `/bookshelf/${bookshelfId}/essay/${essayId}`,
+      {},
+      callback,
+      navigation,
+    );
+  },
 };
 
 const Api = {
+  default: defaultApis,
   auth: authApis,
   user: userApis,
   book: bookApis,

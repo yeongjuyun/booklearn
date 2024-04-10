@@ -13,6 +13,7 @@ import {SettingStackParamList} from 'types/navigation';
 import {Colors} from 'constants/theme';
 import Button from 'components/atoms/Button';
 import Input from 'components/atoms/Input';
+import useInputs from 'hooks/useInputs';
 
 type ProfileChangeNicknameFormProps = {
   navigation: StackNavigationProp<SettingStackParamList>;
@@ -21,16 +22,14 @@ type ProfileChangeNicknameFormProps = {
 const ProfileChangeNicknameForm = ({
   navigation,
 }: ProfileChangeNicknameFormProps) => {
-  const [nickname, setNickname] = useState<string>('');
+  const {values, isValidLength, handleChange} = useInputs({nickname: ''});
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const handlePressSubmit = async () => {
+  const handlePressSubmit = () => {
     setIsLoading(true);
 
-    // TODO: API 확인
-    const payload = {name: nickname};
-    await Api.user.updateNickname(payload, response => {
-      console.log('response', response);
+    const payload = {name: values.nickname};
+    Api.user.updateNickname(payload, response => {
       if (response.type === ResponseType.SUCCESS) {
         navigation.navigate('Profile');
       } else {
@@ -48,12 +47,14 @@ const ProfileChangeNicknameForm = ({
       <View style={styles.form}>
         <Input
           placeholder="닉네임"
+          maxLength={30}
           autoFocus={true}
-          onChangeText={value => setNickname(value)}
+          onChangeText={text => handleChange('nickname', text)}
         />
         <Button
           size="l"
           isLoading={isLoading}
+          disabled={!isValidLength.nickname}
           style={styles.submitButton}
           onPress={handlePressSubmit}>
           변경

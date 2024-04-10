@@ -6,6 +6,7 @@ type ListItemProps = {
   title?: string;
   caption?: string;
   avatarUrl?: string;
+  visible?: boolean;
   startContent?: ReactNode;
   endContent?: ReactNode;
   onPress?: () => void;
@@ -15,10 +16,14 @@ const ListItem = ({
   title,
   caption,
   avatarUrl,
+  visible = true,
   startContent,
   endContent,
   onPress,
 }: ListItemProps) => {
+  if (!visible) {
+    return null;
+  }
   return (
     <TouchableOpacity style={styles.baseWrapper} onPress={onPress}>
       {startContent && <View>{startContent}</View>}

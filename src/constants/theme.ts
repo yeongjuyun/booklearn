@@ -1,3 +1,5 @@
+export const HIT_SLOP = {top: 8, left: 8, right: 8, bottom: 8};
+
 export const theme = {
   colors: {
     primary100: '#3D73DD', // blue

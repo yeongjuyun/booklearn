@@ -1,6 +1,7 @@
-import {TouchableOpacity} from 'react-native';
+import {Pressable} from 'react-native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {AuthStackParamList, RootStackParamList} from 'types/navigation';
+import {HIT_SLOP} from 'constants/theme';
 import Icon from 'components/atoms/Icon';
 import SigninForm from 'components/orginisms/form/SigninForm';
 import DefaultLayout from 'layouts/DefaultLayout';
@@ -15,9 +16,9 @@ const SigninScreen = ({navigation}: SigninScreenProps) => {
       isSafeAreaView
       headerTitle="로그인"
       headerLeftContent={
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Pressable hitSlop={HIT_SLOP} onPress={() => navigation.goBack()}>
           <Icon name="arrow_back" />
-        </TouchableOpacity>
+        </Pressable>
       }>
       <SigninForm navigation={navigation} />
     </DefaultLayout>

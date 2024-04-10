@@ -1,163 +1,163 @@
-import React, {FC, useRef, useState} from 'react';
+import React, {forwardRef, useImperativeHandle, useRef, useState} from 'react';
 import {View, StyleSheet} from 'react-native';
 import useSWR from 'swr';
 import Api from 'libs/axios/api';
 import {ResponseType} from 'types/common';
 import {SWR_KEY} from 'constants/swrKey';
+import useInputs from 'hooks/useInputs';
+import {validationRules} from 'utils/validation';
 import {Colors} from 'constants/theme';
 import Input from 'components/atoms/Input';
 import Button from 'components/atoms/Button';
 import Timer from 'components/atoms/Timer';
 
 type EmailVerificationFormProps = {
-  isSignup: boolean;
-  onSuccessEmailVerification?: () => void;
+  isSignup?: boolean;
+  onSuccessVerification?: () => void;
 };
 
-const EmailVerificationForm: FC<EmailVerificationFormProps> = ({
-  isSignup,
-  onSuccessEmailVerification,
-}: EmailVerificationFormProps) => {
-  const {mutate: auth_verify_email_mutate} = useSWR(SWR_KEY.auth.verify.email);
+const EmailVerificationForm = forwardRef<any, EmailVerificationFormProps>(
+  (
+    {isSignup = false, onSuccessVerification}: EmailVerificationFormProps,
+    ref,
+  ) => {
+    const {mutate: auth_verify_email_mutate} = useSWR(
+      SWR_KEY.auth.verify.email,
+    );
+    const {mutate: auth_verify_done_mutate} = useSWR(SWR_KEY.auth.verify.done);
 
-  const [inputs, setInputs] = useState({email: '', code: ''});
-  const [errorTexts, setErrorTexts] = useState({email: '', code: ''});
-  const [isSend, setIsSend] = useState<boolean>(false);
-  const timerRef = useRef<any>(null);
+    const {
+      values,
+      errors,
+      isValidLength,
+      handleChange,
+      handleBlur,
+      clearInputs,
+      setError,
+    } = useInputs({email: '', verificationCode: ''}, validationRules);
 
-  const [isLoadingSendEmail, setIsLoadingSendEmail] = useState<boolean>(false);
-  const [isLoadingVerifyEmail, setIsLoadingVerifyEmail] =
-    useState<boolean>(false);
+    const [isSend, setIsSend] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const timerRef = useRef<any>(null);
 
-  const isValidEmailInput = inputs.email.length > 0;
+    useImperativeHandle(ref, () => ({
+      getEmail: () => values.email,
+      clearInputs: () => clearInputs(),
+    }));
 
-  const sendEmailVerificationCode = async (onSuccess: () => void) => {
-    setIsLoadingSendEmail(true);
+    const handlePressSendVerificationCode = () => {
+      sendVerificationCode(() => setIsSend(true));
+    };
 
-    const payload = {email: inputs.email, isSignUp: isSignup};
-    await Api.auth.sendEmailVerificationCode(payload, response => {
-      if (response.type === ResponseType.SUCCESS) {
-        onSuccess();
-      } else {
-        setErrorTexts({
-          ...errorTexts,
-          email: response.message,
-        });
+    const handlePressResendVerificationCode = () => {
+      sendVerificationCode(() => timerRef.current?.restart());
+    };
+
+    const sendVerificationCode = (onSuccess: () => void) => {
+      const validationError = handleBlur('email');
+      if (typeof validationError === 'string') {
+        return;
       }
 
-      setIsLoadingSendEmail(false);
-    });
-  };
+      setIsLoading(true);
 
-  const handlePressSendVerificationCode = async () => {
-    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-    if (!emailPattern.test(inputs.email)) {
-      return setErrorTexts({
-        ...errorTexts,
-        email: '이메일 형식으로 입력해주세요',
-      });
-    }
-
-    sendEmailVerificationCode(() => setIsSend(true));
-  };
-
-  const handlePressResendVerificationCode = () => {
-    sendEmailVerificationCode(() => timerRef.current?.restart());
-  };
-
-  const handleSubmitVerificationCode = async () => {
-    setIsLoadingVerifyEmail(true);
-
-    const payload = {email: inputs.email, code: inputs.code};
-    Api.auth.verifyEmailVerificationCode(payload, response => {
-      if (response.type === ResponseType.SUCCESS) {
-        auth_verify_email_mutate(inputs.email);
-        if (onSuccessEmailVerification) {
-          onSuccessEmailVerification();
+      const payload = {email: values.email, isSignUp: !!isSignup};
+      Api.auth.sendEmailVerificationCode(payload, response => {
+        if (response.type === ResponseType.SUCCESS) {
+          auth_verify_email_mutate(values.email);
+          onSuccess();
+        } else {
+          setError('email', response.message);
         }
-      } else {
-        setErrorTexts({
-          ...errorTexts,
-          code: response.message,
-        });
-      }
 
-      setIsLoadingVerifyEmail(false);
-    });
-  };
+        setIsLoading(false);
+      });
+    };
 
-  return (
-    <View style={styles.form}>
-      <View style={styles.inputWrapper}>
-        <Input
-          type={'email'}
-          placeholder="이메일"
-          value={inputs.email}
-          maxLength={300}
-          autoFocus
-          blurOnSubmit={false}
-          isDisabled={isSend}
-          errorText={errorTexts.email}
-          onChangeText={value => {
-            setInputs({...inputs, email: value});
-            setErrorTexts({...errorTexts, email: ''});
-          }}
-          onSubmitEditing={handlePressSendVerificationCode}
-        />
-        {isSend && (
+    const handleSubmitVerificationCode = () => {
+      setIsLoading(true);
+
+      const payload = {email: values.email, code: values.verificationCode};
+      Api.auth.verifyEmailVerificationCode(payload, response => {
+        if (response.type === ResponseType.SUCCESS) {
+          onSuccessVerification?.();
+          auth_verify_done_mutate(true);
+        } else {
+          setError('verificationCode', response.message);
+        }
+        setIsLoading(false);
+      });
+    };
+
+    return (
+      <View style={styles.form}>
+        <View style={styles.inputWrapper}>
           <Input
-            placeholder="인증코드"
-            value={inputs.code}
-            maxLength={30}
+            type="email"
+            placeholder="이메일"
+            value={values.email}
+            maxLength={300}
             autoFocus
             blurOnSubmit={false}
-            endContent={
-              <Timer ref={timerRef} duration={300000} autoStart={isSend} />
-            }
-            errorText={errorTexts.code}
-            onChangeText={value => {
-              setInputs({...inputs, code: value});
-              setErrorTexts({...errorTexts, code: ''});
-            }}
-            onSubmitEditing={handleSubmitVerificationCode}
+            isDisabled={isSend}
+            errorText={errors.email}
+            onChangeText={text => handleChange('email', text)}
+            onSubmitEditing={handlePressSendVerificationCode}
           />
-        )}
-      </View>
-      <View style={styles.buttonWrapper}>
-        {!isSend ? (
-          <Button
-            size="l"
-            disabled={!isValidEmailInput}
-            isLoading={isLoadingSendEmail}
-            style={styles.verificationButton}
-            onPress={handlePressSendVerificationCode}>
-            인증코드 발송
-          </Button>
-        ) : (
-          <>
+          {isSend && (
+            <Input
+              placeholder="인증코드"
+              value={values.verificationCode}
+              maxLength={30}
+              autoFocus
+              blurOnSubmit={false}
+              endContent={
+                <Timer ref={timerRef} duration={300000} autoStart={isSend} />
+              }
+              errorText={errors.verificationCode}
+              onChangeText={text => handleChange('verificationCode', text)}
+              onSubmitEditing={handleSubmitVerificationCode}
+            />
+          )}
+        </View>
+        <View style={styles.buttonWrapper}>
+          {!isSend ? (
             <Button
               size="l"
-              textStyle={{color: Colors.primary}}
-              style={styles.resendButton}
-              disabled={!isValidEmailInput}
-              isLoading={isLoadingSendEmail}
-              onPress={handlePressResendVerificationCode}>
-              인증코드 재전송
-            </Button>
-            <Button
-              size="l"
-              disabled={!(isValidEmailInput && inputs.code.length > 0)}
-              isLoading={isLoadingVerifyEmail}
+              disabled={!isValidLength.email}
+              isLoading={isLoading}
               style={styles.verificationButton}
-              onPress={handleSubmitVerificationCode}>
-              인증하기
+              onPress={handlePressSendVerificationCode}>
+              인증코드 발송
             </Button>
-          </>
-        )}
+          ) : (
+            <>
+              <Button
+                size="l"
+                textStyle={{color: Colors.primary}}
+                style={styles.resendButton}
+                disabled={!isValidLength.email}
+                isLoading={isLoading}
+                onPress={handlePressResendVerificationCode}>
+                인증코드 재전송
+              </Button>
+              <Button
+                size="l"
+                style={styles.verificationButton}
+                disabled={
+                  !(isValidLength.email && isValidLength.verificationCode)
+                }
+                isLoading={isLoading}
+                onPress={handleSubmitVerificationCode}>
+                인증하기
+              </Button>
+            </>
+          )}
+        </View>
       </View>
-    </View>
-  );
-};
+    );
+  },
+);
 
 export default EmailVerificationForm;
 

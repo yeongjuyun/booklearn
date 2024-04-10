@@ -1,181 +1,99 @@
+import {useEffect} from 'react';
+import {Image, Pressable, ScrollView, StyleSheet, View} from 'react-native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {
-  Alert,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-  useColorScheme,
-} from 'react-native';
-import DefaultLayout from 'layouts/DefaultLayout';
+import {RouteProp, useRoute} from '@react-navigation/native';
+import EssayImage from 'assets/image/essay.png';
+import {BookStackParamList} from 'types/navigation';
+import {Colors, HIT_SLOP} from 'constants/theme';
+import useInputs from 'hooks/useInputs';
 import Text from 'components/atoms/Text';
-import {BookStackParamList, RootStackParamList} from 'types/navigation';
 import Icon from 'components/atoms/Icon';
-import {Colors} from 'constants/theme';
-import Input from 'components/atoms/Input';
-import {useEffect, useRef, useState} from 'react';
-import Divider from 'components/atoms/Divider';
-import Button from 'components/atoms/Button';
+import DefaultLayout from 'layouts/DefaultLayout';
 
 type BookEssayDetailProps = {
-  navigation: StackNavigationProp<RootStackParamList & BookStackParamList>;
+  navigation: StackNavigationProp<BookStackParamList>;
 };
 
-function BookEssayDetailScreen({navigation}: BookEssayDetailProps) {
-  const isDarkMode = useColorScheme() === 'dark';
-  const [content, setContent] = useState('');
-  const [isEditMode, setIsEditMode] = useState<boolean>(false);
+type BookEssayScreenRouteProp = RouteProp<BookStackParamList, 'Essay'>;
 
-  const textInputRef = useRef<TextInput>(null);
+function BookEssayDetailScreen({navigation}: BookEssayDetailProps) {
+  const route = useRoute<BookEssayScreenRouteProp>();
+
+  const {values, handleChange} = useInputs({
+    bookshelfId: route.params?.id,
+    id: route.params.essay?.id,
+    content: route.params.essay?.content,
+    createdAt: route.params.essay?.createdAt,
+    updatedAt: route.params.essay?.updatedAt,
+  });
+
   const handlePressEdit = () => {
-    // navigation.navigate('EditEssay');
-    setIsEditMode(prev => !prev);
+    navigation.navigate('EditEssay', {id: values.bookshelfId, essay: values});
   };
 
   useEffect(() => {
-    if (isEditMode) {
-      textInputRef.current?.focus();
-    } else {
-      Keyboard.dismiss();
+    if (route.params.essay) {
+      handleChange('content', route.params.essay.content);
     }
-  }, [isEditMode]);
-
-  const backgroundColor = isDarkMode
-    ? Colors.dark.background
-    : Colors.light.background;
-  const bottomControlBackgroundColor = isDarkMode
-    ? Colors.dark.surface
-    : Colors.light.surface;
-  const textColor = isDarkMode ? Colors.dark.text : Colors.light.text;
-  const inputStyle = {color: textColor};
-  const buttonControlStyle = {
-    backgroundColor: bottomControlBackgroundColor,
-    // marginBottom: Platform.OS === 'ios' ? (isEditMode ? 48 : 0) : isEditMode ? 20 : 0,
-  };
-
-  useEffect(
-    () =>
-      navigation.addListener('beforeRemove', e => {
-        if (!isEditMode) {
-          // If we don't have unsaved changes, then we don't need to do anything
-          return;
-        }
-
-        // Prevent default behavior of leaving the screen
-        e.preventDefault();
-
-        if (isEditMode) {
-          // Prompt the user before leaving the screen
-          Alert.alert(
-            'Discard changes?',
-            'You have unsaved changes. Are you sure to discard them and leave the screen?',
-            [
-              {text: "Don't leave", style: 'cancel', onPress: () => {}},
-              {
-                text: 'Discard',
-                style: 'destructive',
-                // If the user confirmed, then we dispatch the action we blocked earlier
-                // This will continue the action that had triggered the removal of the screen
-                onPress: () => navigation.dispatch(e.data.action),
-              },
-            ],
-          );
-        }
-      }),
-    [navigation, isEditMode],
-  );
+  }, [route.params.essay?.content]);
 
   return (
     <DefaultLayout
       headerTitle="에세이 보기"
-      // backgroundColor={backgroundColor}
-      isSafeAreaView={isEditMode}
       headerLeftContent={
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Pressable hitSlop={HIT_SLOP} onPress={() => navigation.goBack()}>
           <Icon name="arrow_back" size={20} />
-        </TouchableOpacity>
+        </Pressable>
       }
       headerRightContent={
-        <TouchableOpacity onPress={() => navigation.navigate('EditEssay')}>
+        <Pressable hitSlop={HIT_SLOP} onPress={handlePressEdit}>
           <Text body style={{color: Colors.primary}}>
             편집
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       }>
-      <ScrollView contentContainerStyle={{flexGrow: 1}}>
-        <TextInput
-          ref={textInputRef}
-          placeholder="내용을 입력해주세요"
-          value={content}
-          multiline
-          editable={false}
-          style={[styles.textInput, inputStyle]}
-          onChangeText={text => setContent(text)}
-        />
-      </ScrollView>
-      {/* {isEditMode ? (
-        <>
-          <KeyboardAvoidingView
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 48 : 25}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={[styles.baseWrapper, { backgroundColor: backgroundColor }]}>
-            <TextInput
-              ref={textInputRef}
-              placeholder="내용을 입력해주세요"
-              value={content}
-              numberOfLines={30}
-              multiline
-              editable={true}
-              style={[styles.textInput, inputStyle]}
-              onChangeText={text => setContent(text)}
-            />
-            {isEditMode && (
-              <View style={[styles.bottomControlWrapper, buttonControlStyle]}>
-                <Icon name="camera" size={26} />
-                <Icon name="gallery" size={26} />
-              </View>
-            )}
-          </KeyboardAvoidingView>
-        </>
-      ) : (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          <TextInput
-            ref={textInputRef}
-            placeholder="내용을 입력해주세요"
-            value={content}
-            multiline
-            editable={false}
-            style={[styles.textInput, inputStyle]}
-            onChangeText={text => setContent(text)}
-          />
+      {values.content ? (
+        <ScrollView style={styles.scrollViewWrapper}>
+          <Text body numberOfLines={10000} style={styles.text}>
+            {values.content}
+          </Text>
         </ScrollView>
-      )} */}
+      ) : (
+        <View style={styles.ViewWrapper}>
+          <Image source={EssayImage} style={styles.essayImage} />
+          <Text caption style={styles.placeholder}>
+            상단 편집 버튼을 통해 에세이를 작성해보세요
+          </Text>
+        </View>
+      )}
     </DefaultLayout>
   );
 }
 export default BookEssayDetailScreen;
 
 const styles = StyleSheet.create({
-  baseWrapper: {
+  scrollViewWrapper: {
     flex: 1,
   },
-  textInput: {
+  ViewWrapper: {
     flex: 1,
-    fontSize: 16,
-    textAlignVertical: 'top',
-    padding: 16,
-  },
-  bottomControlWrapper: {
-    height: 48,
-    flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
+    gap: 30,
+    paddingBottom: 120,
+  },
+  essayImage: {
+    width: 240,
+    height: 240,
+  },
+  text: {
     paddingHorizontal: 16,
-    gap: 15,
+    paddingBottom: 30,
+  },
+  subText: {},
+  placeholder: {
+    textAlign: 'center',
+    paddingHorizontal: 16,
+    paddingBottom: 30,
   },
 });

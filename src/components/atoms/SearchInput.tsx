@@ -42,9 +42,7 @@ const SearchInput = ({
   const placeholderColor = isDarkMode
     ? Colors.dark.placeholder
     : Colors.dark.placeholder;
-  const textInputColor = {
-    color: isDarkMode ? Colors.dark.text : Colors.light.text,
-  };
+  const textInputColor = isDarkMode ? Colors.dark.text : Colors.light.text;
   const textInputBackgroundColor = {
     backgroundColor: isDarkMode ? Colors.dark.surface : Colors.light.surface,
   };
@@ -73,11 +71,11 @@ const SearchInput = ({
           placeholder={placeholder}
           maxLength={maxLength}
           editable={editable}
-          autoFocus={autoFocus}
+          autoFocus={false}
           autoComplete="off"
           cursorColor={Colors.primary}
           placeholderTextColor={placeholderColor}
-          style={[styles.textInput, textInputColor]}
+          style={[styles.textInput, {color: textInputColor}]}
           onSubmitEditing={handleSubmitEditing}
           onChangeText={onChangeText}
           {...props}

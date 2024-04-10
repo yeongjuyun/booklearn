@@ -1,20 +1,23 @@
-import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamList, SettingStackParamList} from 'types/navigation';
-import Text from 'components/atoms/Text';
-import DefaultLayout from 'layouts/DefaultLayout';
+import {useEffect, useState} from 'react';
 import {
   Alert,
   Linking,
+  Pressable,
   StyleSheet,
-  TouchableOpacity,
   View,
   useColorScheme,
 } from 'react-native';
-import Icon from 'components/atoms/Icon';
-import ListItem from 'components/molecules/ListItem';
-import {Colors} from 'constants/theme';
-import Divider from 'components/atoms/Divider';
+import {StackNavigationProp} from '@react-navigation/stack';
 import {removeTokensFromStorage} from 'libs/async-storage';
+import Api from 'libs/axios/api';
+import {ResponseType} from 'types/common';
+import {RootStackParamList, SettingStackParamList} from 'types/navigation';
+import {Colors, HIT_SLOP} from 'constants/theme';
+import Text from 'components/atoms/Text';
+import Icon from 'components/atoms/Icon';
+import Divider from 'components/atoms/Divider';
+import ListItem from 'components/molecules/ListItem';
+import DefaultLayout from 'layouts/DefaultLayout';
 
 type SettingScreenProps = {
   navigation: StackNavigationProp<RootStackParamList & SettingStackParamList>;
@@ -22,21 +25,15 @@ type SettingScreenProps = {
 
 const SettingScreen = ({navigation}: SettingScreenProps) => {
   const isDarkMode = useColorScheme() === 'dark';
-
   const borderColor = isDarkMode ? Colors.dark.border : Colors.light.border;
   const listBackgroundColor = isDarkMode
     ? Colors.dark.surface
     : Colors.light.surface;
 
-  const handlePressLogout = () => {
-    // TODO: API 연동 후에 Logout Navigation 로직 수정
-    removeTokensFromStorage();
-    // 성공일 경우
-    navigation.navigate('Auth');
-  };
+  const [appVersion, setAppVersion] = useState<string>('');
 
   const handlePressNotDevelop = () => {
-    Alert.alert('업데이트 예정', '현재 준비중인 기능입니다');
+    Alert.alert('업데이트 예정', '현재 준비중인 기능입니다', [{text: '확인'}]);
   };
 
   const handlePressInquire = async () => {
@@ -49,17 +46,38 @@ const SettingScreen = ({navigation}: SettingScreenProps) => {
     try {
       await Linking.openURL(mailtoLink);
     } catch (error) {
-      console.error('메일 앱을 여는 중 오류 발생:', error);
+      Alert.alert('', `메일 앱을 여는 중 오류 발생:, ${error}`, [
+        {text: '확인'},
+      ]);
     }
   };
+
+  const handlePressLogout = () => {
+    removeTokensFromStorage();
+    navigation.navigate('Auth');
+  };
+
+  const fetchAppVersion = () => {
+    Api.default.getAppVersions(undefined, response => {
+      if (response.type === ResponseType.SUCCESS) {
+        const version = response.data[0].version;
+        setAppVersion(version);
+      }
+    });
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', fetchAppVersion);
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <DefaultLayout
       headerTitle="설정"
       headerLeftContent={
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Pressable hitSlop={HIT_SLOP} onPress={() => navigation.goBack()}>
           <Icon name="arrow_back" size={20} />
-        </TouchableOpacity>
+        </Pressable>
       }>
       <View>
         <Text caption style={styles.listTitle}>
@@ -124,8 +142,15 @@ const SettingScreen = ({navigation}: SettingScreenProps) => {
             styles.listWrapper,
             {borderColor: borderColor, backgroundColor: listBackgroundColor},
           ]}>
-          <ListItem title="약관 및 정책" />
-          <ListItem title="앱 버전" endContent={<Text>v1.0.0</Text>} />
+          <ListItem
+            title="약관 및 정책"
+            endContent={<Icon name="expand_move" />}
+            onPress={() => navigation.navigate('Policy')}
+          />
+          <ListItem
+            title="앱 버전"
+            endContent={<Text body>{appVersion}</Text>}
+          />
           <ListItem title="문의하기" onPress={handlePressInquire} />
           <ListItem title="로그아웃" onPress={handlePressLogout} />
         </View>

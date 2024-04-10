@@ -9,7 +9,7 @@ import {
   useColorScheme,
   TouchableOpacity,
 } from 'react-native';
-import normalize from 'utls/nomalizeText';
+import normalize from 'utils/nomalizeText';
 
 interface TextProps extends TextProperties {
   style?: StyleProp<TextStyle>;

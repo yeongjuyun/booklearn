@@ -1,7 +1,6 @@
 import {Alert} from 'react-native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import axios, {AxiosResponse} from 'axios';
-import {Fetcher} from 'swr';
 import {
   getTokensFromStorage,
   removeTokensFromStorage,
@@ -134,7 +133,35 @@ export const POST = async (
 
   try {
     const res = await instance.post(url, payload);
-    console.log('res', res);
+    const {type, code, data, message} = res.data;
+
+    response.type = type;
+    response.code = code;
+    response.data = data;
+    response.message = message || '요청 실패';
+    if (typeof callback === 'function') {
+      callback(response);
+    }
+  } catch (error) {
+    response.message = `요청실패: ${error}`;
+  } finally {
+  }
+};
+
+export const UPDATE = async (
+  url: string,
+  payload: any,
+  callback?: (response: Response) => void,
+  navigation?: StackNavigationProp<any>,
+) => {
+  const response: Response = {
+    type: ResponseType.FAILURE,
+    code: '99999',
+    message: '',
+  };
+
+  try {
+    const res = await instance.patch(url, payload);
     const {type, code, data, message} = res.data;
 
     response.type = type;
@@ -177,13 +204,4 @@ export const DELETE = async (
     response.message = `요청실패: ${error}`;
   } finally {
   }
-};
-
-export const fetcher = <T = any>(): Fetcher<T, Request> => {
-  return (payload: Request) =>
-    instance({
-      method: payload.method,
-      url: payload.url,
-      data: payload.param,
-    }).then(res => res.data.data);
 };

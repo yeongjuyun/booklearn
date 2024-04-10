@@ -20,7 +20,6 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
-	<!-- KakaoLogin -->
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -33,17 +32,25 @@
 				<string>kakaoc87ec3105e4c3437a1ca3ce3a2f33ed6</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>Google</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.33395763326-osvnrurhbolc4qo4rr2d54j0fvb9ho38</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
-	<!-- KakaoLogin -->
 	<key>KAKAO_APP_KEY</key>
 	<string>c87ec3105e4c3437a1ca3ce3a2f33ed6</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
-	  <!-- Do not change NSAllowsArbitraryLoads to true, or you will risk app rejection! -->
 		<key>NSAllowsArbitraryLoads</key>
 		<false/>
 		<key>NSAllowsLocalNetworking</key>

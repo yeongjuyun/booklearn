@@ -1,10 +1,11 @@
+import {BookEssay, BookMemo} from './book';
+import {Policy} from './common';
+
 // export enum RootNavigation {
 //   SIGNUP = 'Signup',
 //   LOGIN = 'Login',
 //   HOME = 'Home',
 // }
-
-import {BookMemo} from './book';
 
 // export enum StackNavigation {
 //   MAIN = 'Main',
@@ -44,9 +45,9 @@ export type BookStackParamList = {
   Main: undefined;
   Detail: {id: string};
   Search: undefined;
-  Essay: undefined;
+  Essay: {id: string; essay: BookEssay};
   EditMemo?: {id: string; bookMemo: BookMemo};
-  EditEssay: undefined;
+  EditEssay: {id: string; essay: BookEssay};
 };
 
 export type SearchStackParamList = {
@@ -62,8 +63,10 @@ export type SettingStackParamList = {
   ProfileNickname: undefined;
   ProfilePassword: undefined;
   ReleaseNote: undefined;
-  ReleaseNoteDetail: {title: string};
+  ReleaseNoteDetail: {title: string; content: string};
   ThemeSetting: undefined;
+  Policy: undefined;
+  PolicyDetail: {type: Policy};
 };
 
 export type TabParamList = {

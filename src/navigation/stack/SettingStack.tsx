@@ -8,6 +8,8 @@ import ProfilePasswordScreen from 'screens/setting/ProfilePasswordScreen';
 import ReleaseNoteScreen from 'screens/setting/ReleaseNoteScreen';
 import ReleaseNoteDetailScreen from 'screens/setting/ReleaseNoteDetailScreen';
 import ThemeSettingScreen from 'screens/setting/ThemeSettingScreen';
+import PolicyScreen from 'screens/setting/PolicyScreen';
+import PolicyDetailScreen from 'screens/setting/PolicyDetailScreen';
 
 const Stack = createNativeStackNavigator<SettingStackParamList>();
 
@@ -28,6 +30,8 @@ export const SettingStack = ({
         component={ReleaseNoteDetailScreen}
       />
       <Stack.Screen name="ThemeSetting" component={ThemeSettingScreen} />
+      <Stack.Screen name="Policy" component={PolicyScreen} />
+      <Stack.Screen name="PolicyDetail" component={PolicyDetailScreen} />
     </Stack.Navigator>
   );
 };

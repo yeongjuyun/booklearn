@@ -5,6 +5,7 @@ module.exports = {
     'prettier/prettier': ['error', {singleQuote: true}],
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': 'off',
+    'react-hooks/exhaustive-deps': 'off',
     'react/react-in-jsx-scope': 0,
     'react/prefer-stateless-function': 0,
     'react/jsx-filename-extension': 0,

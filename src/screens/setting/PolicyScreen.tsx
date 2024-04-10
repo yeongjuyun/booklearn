@@ -1,43 +1,27 @@
-import {useEffect, useState} from 'react';
 import {Pressable, StyleSheet, View, useColorScheme} from 'react-native';
-import {
-  loadThemePreference,
-  saveThemePreference,
-} from 'libs/async-storage/theme';
 import {StackNavigationProp} from '@react-navigation/stack';
+import {Policy} from 'types/common';
 import {SettingStackParamList} from 'types/navigation';
 import {Colors, HIT_SLOP} from 'constants/theme';
 import Icon from 'components/atoms/Icon';
 import ListItem from 'components/molecules/ListItem';
 import DefaultLayout from 'layouts/DefaultLayout';
 
-type ThemeSettingScreenProps = {
+type PolicyScreenProps = {
   navigation: StackNavigationProp<SettingStackParamList>;
 };
 
-const ThemeSettingScreen = ({navigation}: ThemeSettingScreenProps) => {
+const PolicyScreen = ({navigation}: PolicyScreenProps) => {
   const isDarkMode = useColorScheme() === 'dark';
-  const [isDarkTheme, setIsDarkTheme] = useState(isDarkMode);
 
   const borderColor = isDarkMode ? Colors.dark.border : Colors.light.border;
   const listBackgroundColor = isDarkMode
     ? Colors.dark.surface
     : Colors.light.surface;
 
-  useEffect(() => {
-    loadThemePreference().then(theme => {
-      setIsDarkTheme(theme);
-    });
-  }, []);
-
-  const handleThemeChange = async (theme: boolean) => {
-    setIsDarkTheme(theme);
-    await saveThemePreference(theme);
-  };
-
   return (
     <DefaultLayout
-      headerTitle="테마 설정"
+      headerTitle="약관 및 정책"
       headerLeftContent={
         <Pressable hitSlop={HIT_SLOP} onPress={() => navigation.goBack()}>
           <Icon name="arrow_back" size={20} />
@@ -49,21 +33,25 @@ const ThemeSettingScreen = ({navigation}: ThemeSettingScreenProps) => {
           {borderColor: borderColor, backgroundColor: listBackgroundColor},
         ]}>
         <ListItem
-          title={'라이트 모드'}
-          endContent={!isDarkTheme && <Icon name="check" />}
-          onPress={() => handleThemeChange(false)}
+          title="서비스 이용약관"
+          endContent={<Icon name="expand_move" />}
+          onPress={() =>
+            navigation.navigate('PolicyDetail', {type: Policy.TERMS_OF_SERVICE})
+          }
         />
         <ListItem
-          title={'다크 모드'}
-          endContent={isDarkTheme && <Icon name="check" />}
-          onPress={() => handleThemeChange(true)}
+          title="개인정보 처리방침"
+          endContent={<Icon name="expand_move" />}
+          onPress={() =>
+            navigation.navigate('PolicyDetail', {type: Policy.PRIVACY_POLICY})
+          }
         />
       </View>
     </DefaultLayout>
   );
 };
 
-export default ThemeSettingScreen;
+export default PolicyScreen;
 
 const styles = StyleSheet.create({
   listTitle: {
@@ -74,5 +62,8 @@ const styles = StyleSheet.create({
   listWrapper: {
     borderTopWidth: 0.5,
     borderBottomWidth: 0.5,
+  },
+  listItem: {
+    width: 130,
   },
 });

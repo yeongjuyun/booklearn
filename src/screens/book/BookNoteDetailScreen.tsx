@@ -3,6 +3,7 @@ import {
   Alert,
   Image,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -15,7 +16,7 @@ import {ResponseType} from 'types/common';
 import {BookStackParamList} from 'types/navigation';
 import {Book, MemoSortType} from 'types/book';
 import {INIT_BOOK_MEMO} from 'constants/init';
-import {Colors} from 'constants/theme';
+import {Colors, HIT_SLOP} from 'constants/theme';
 import Icon from 'components/atoms/Icon';
 import Text from 'components/atoms/Text';
 import Button from 'components/atoms/Button';
@@ -72,6 +73,56 @@ const BookNoteDetailScreen = ({navigation}: BookNoteDetailScreenProps) => {
     return sortedMemos;
   }, [bookDetail, memoSortType]);
 
+  useEffect(() => {
+    const fetchBookDetail = () => {
+      const payload = {bookshelfId: route.params.id};
+      Api.bookshelf.getBookshelfById(payload, response => {
+        if (response.type === ResponseType.SUCCESS) {
+          const {id, book, memos, essay} = response.data;
+          setBookDetail({
+            bookshelfId: id,
+            id: book.id,
+            isbn: book.isbn,
+            title: book.title,
+            cover: book.cover,
+            author: book.author,
+            publisher: book.publisher,
+            memoList: memos,
+            essay: essay,
+          });
+        } else {
+          Alert.alert('조회 실패', response.message, [{text: '확인'}]);
+        }
+      });
+    };
+
+    const unsubscribe = navigation.addListener('focus', fetchBookDetail);
+    return unsubscribe;
+  }, [navigation, route.params?.id]);
+
+  const deleteBook = () => {
+    if (!bookDetail?.bookshelfId) {
+      return Alert.alert(
+        '요청 실패',
+        '책을 삭제하는 동안 오류가 발생했습니다',
+        [{text: '확인'}],
+      );
+    }
+
+    setIsLoading(true);
+
+    const payload = {id: bookDetail.bookshelfId};
+    Api.bookshelf.deleteBookshelfById(payload, response => {
+      if (response.type === ResponseType.SUCCESS) {
+        navigation.navigate('Main');
+      } else {
+        Alert.alert('삭제 실패', response.message, [{text: '확인'}]);
+      }
+      handleCancelSetting();
+      setIsLoading(false);
+    });
+  };
+
   const handlePressSort = () => {
     setMemoSortVisible(true);
   };
@@ -93,153 +144,123 @@ const BookNoteDetailScreen = ({navigation}: BookNoteDetailScreenProps) => {
     setMemoSettingVisible(false);
   };
 
-  const handlePressDeleteBook = () => {
-    //TODO: 책 삭제 API 테스트 필요
-    Alert.alert('삭제', '책을 삭제하시겠습니까?', [
-      {text: '취소', style: 'cancel', onPress: handleCancelSetting},
-      {
-        text: '삭제',
-        style: 'destructive',
-        onPress: () => {
-          if (!bookDetail?.id) {
-            return Alert.alert(
-              '요청 실패',
-              '책을 삭제하는 동안 오류가 발생했습니다',
-            );
-          }
-
-          setIsLoading(true);
-
-          const payload = {id: bookDetail.id};
-          Api.bookshelf.deleteBookshelfById(payload, response => {
-            //TODO: 로딩처리, 기능 확인
-            console.log('response', response);
-            if (response.type === ResponseType.SUCCESS) {
-              navigation.navigate('Main');
-            } else {
-              Alert.alert('요청 실패', response.message);
-            }
-            handleCancelSetting();
-            setIsLoading(false);
-          });
-        },
-      },
-    ]);
+  const handlePressEssay = () => {
+    if (bookDetail) {
+      navigation.navigate('Essay', {
+        id: bookDetail.bookshelfId,
+        essay: bookDetail.essay,
+      });
+    } else {
+      Alert.alert('에세이 조회 실패', '에세이 정보를 불러오는데 실패했습니다', [
+        {text: '확인'},
+      ]);
+    }
   };
 
-  useEffect(() => {
-    const fetchBookDetailData = () => {
-      Api.bookshelf.getBookshelfById({id: route.params?.id || ''}, response => {
-        if (response.type === ResponseType.SUCCESS) {
-          const {id, book, memos, essay} = response.data;
-          setBookDetail({
-            id: book.id,
-            isbn: book.isbn,
-            title: book.title,
-            cover: book.cover,
-            author: book.author,
-            publisher: book.publisher,
-            memoList: memos,
-            essay: essay,
-          });
-        }
-      });
-    };
-
-    const unsubscribe = navigation.addListener('focus', () => {
-      fetchBookDetailData();
-    });
-
-    return unsubscribe;
-  }, [navigation, route.params?.id]);
+  const handlePressDeleteBook = () => {
+    Alert.alert('삭제', '독서 기록을 삭제하시겠습니까?', [
+      {text: '취소', style: 'cancel', onPress: handleCancelSetting},
+      {text: '삭제', style: 'destructive', onPress: deleteBook},
+    ]);
+  };
 
   return (
     <DefaultLayout
       headerTitle="독서 기록"
       isSafeAreaView={false}
       headerLeftContent={
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Pressable hitSlop={HIT_SLOP} onPress={() => navigation.goBack()}>
           <Icon name="arrow_back" size={20} />
-        </TouchableOpacity>
+        </Pressable>
       }
       headerRightContent={
-        <TouchableOpacity onPress={handlePressSetting}>
+        <Pressable hitSlop={HIT_SLOP} onPress={handlePressSetting}>
           <Icon name="more_horizontal" />
-        </TouchableOpacity>
+        </Pressable>
       }>
-      {!bookDetail ? (
-        <View style={styles.spinnerWrapper}>
-          <Spinner />
-        </View>
+      {isLoading ? (
+        <Spinner />
       ) : (
         <>
-          <ScrollView style={styles.base}>
-            <View style={styles.bookDetailWrapper}>
-              <Image source={{uri: bookDetail.cover}} style={styles.cover} />
-              <View style={styles.bookInfoWrapper}>
-                <Text h4 numberOfLines={2}>
-                  {bookDetail.title}
-                </Text>
-                <View style={{flex: 1}}>
-                  <Text caption>{bookDetail.author}</Text>
-                  <Text caption>{bookDetail.publisher}</Text>
+          {bookDetail && (
+            <>
+              <ScrollView style={styles.base}>
+                <View style={styles.bookDetailWrapper}>
+                  <Image
+                    source={{uri: bookDetail.cover}}
+                    style={styles.cover}
+                  />
+                  <View style={styles.bookInfoWrapper}>
+                    <Text h4 numberOfLines={2}>
+                      {bookDetail.title}
+                    </Text>
+                    <View style={{flex: 1}}>
+                      <Text caption>{bookDetail.author}</Text>
+                      <Text caption>{bookDetail.publisher}</Text>
+                    </View>
+                    <Button size="m" onPress={handlePressEssay}>
+                      에세이 보기
+                    </Button>
+                  </View>
                 </View>
-                <Button size="m" onPress={() => navigation.navigate('Essay')}>
-                  에세이 보기
-                </Button>
-              </View>
-            </View>
-            <View style={styles.bookMemoWrapper}>
-              <View style={styles.bookMemoHeader}>
-                <Text h4>메모 {bookDetail.memoList.length}</Text>
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  style={styles.bookMemoSort}
-                  onPress={handlePressSort}>
-                  <Icon name="sort" />
-                  <Text body>{memoSortType}</Text>
-                </TouchableOpacity>
-              </View>
-              <BookMemoList
-                bookId={bookDetail.id}
-                data={sortedBookMemoList}
-                navigation={navigation}
-              />
-            </View>
-          </ScrollView>
-          <TouchableOpacity
-            activeOpacity={1}
-            style={styles.floatingButton}
-            onPress={() =>
-              navigation.navigate('EditMemo', {
-                id: bookDetail.id,
-                bookMemo: INIT_BOOK_MEMO,
-              })
-            }>
-            <Icon name="write" size={24} color={Colors.white} />
-          </TouchableOpacity>
+                <View style={styles.bookMemoWrapper}>
+                  <View style={styles.bookMemoHeader}>
+                    <Text h4>메모 {bookDetail.memoList.length}</Text>
+                    <Pressable
+                      hitSlop={HIT_SLOP}
+                      style={styles.bookMemoSort}
+                      onPress={handlePressSort}>
+                      <Icon name="sort" />
+                      <Text body>{memoSortType}</Text>
+                    </Pressable>
+                  </View>
+                  <BookMemoList
+                    bookId={bookDetail.id}
+                    data={sortedBookMemoList}
+                    navigation={navigation}
+                  />
+                </View>
+              </ScrollView>
+              <TouchableOpacity
+                activeOpacity={1}
+                style={styles.floatingButton}
+                onPress={() =>
+                  navigation.navigate('EditMemo', {
+                    id: bookDetail.bookshelfId,
+                    bookMemo: INIT_BOOK_MEMO,
+                  })
+                }>
+                <Icon name="write" size={24} color={Colors.white} />
+              </TouchableOpacity>
+            </>
+          )}
+          {/* 정렬 ActionSheet */}
+          <ActionSheet
+            title="정렬 기준 선택"
+            visible={memoSortVisible}
+            onCancel={handleCancelSort}>
+            {Object.values(MemoSortType).map(type => {
+              return (
+                <ActionSheetItem
+                  key={type}
+                  title={type}
+                  isSelected={memoSortType === type}
+                  onPress={() => handlePressSortOption(type)}
+                />
+              );
+            })}
+          </ActionSheet>
+          {/* 네비게이션 우측 메뉴 ActionSheet */}
+          <ActionSheet
+            visible={memoSettingVisible}
+            onCancel={handleCancelSetting}>
+            <ActionSheetItem
+              title={'삭제하기'}
+              onPress={handlePressDeleteBook}
+            />
+          </ActionSheet>
         </>
       )}
-      {/* 정렬 ActionSheet */}
-      <ActionSheet
-        title="정렬 기준 선택"
-        visible={memoSortVisible}
-        onCancel={handleCancelSort}>
-        {Object.values(MemoSortType).map(type => {
-          return (
-            <ActionSheetItem
-              key={type}
-              title={type}
-              isSelected={memoSortType === type}
-              onPress={() => handlePressSortOption(type)}
-            />
-          );
-        })}
-      </ActionSheet>
-      {/* 네비게이션 우측 메뉴 ActionSheet */}
-      <ActionSheet visible={memoSettingVisible} onCancel={handleCancelSetting}>
-        <ActionSheetItem title={'삭제하기'} onPress={handlePressDeleteBook} />
-      </ActionSheet>
     </DefaultLayout>
   );
 };

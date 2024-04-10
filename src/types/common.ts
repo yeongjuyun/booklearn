@@ -26,6 +26,28 @@ export type Response = {
   message: string;
 };
 
+// 정책
+export enum Policy {
+  TERMS_OF_SERVICE = 0,
+  PRIVACY_POLICY = 1,
+}
+
+// 로그인 타입
+export enum SigninProviderType {
+  GOOGLE = 'google',
+  KAKAO = 'kakao',
+  APPLE = 'apple',
+  LOCAL = 'local',
+}
+
+export type ReleaseNote = {
+  id: string | number;
+  version: string;
+  date: string;
+  title: string;
+  content: string;
+};
+
 export type AuthType = {
   userId: string;
   password: string;

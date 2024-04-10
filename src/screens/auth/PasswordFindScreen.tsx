@@ -1,6 +1,7 @@
+import {Pressable} from 'react-native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {TouchableOpacity} from 'react-native';
 import {AuthStackParamList} from 'types/navigation';
+import {HIT_SLOP} from 'constants/theme';
 import Icon from 'components/atoms/Icon';
 import PasswordFindForm from 'components/orginisms/form/PasswordFindForm';
 import DefaultLayout from 'layouts/DefaultLayout';
@@ -15,9 +16,9 @@ const PasswordFindScreen = ({navigation}: PasswordFindScreenProps) => {
       isSafeAreaView
       headerTitle="비밀번호 찾기"
       headerLeftContent={
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Pressable hitSlop={HIT_SLOP} onPress={() => navigation.goBack()}>
           <Icon name="arrow_back" />
-        </TouchableOpacity>
+        </Pressable>
       }>
       <PasswordFindForm navigation={navigation} />
     </DefaultLayout>

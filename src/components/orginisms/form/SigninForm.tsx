@@ -20,26 +20,30 @@ import {Colors} from 'constants/theme';
 import Button from 'components/atoms/Button';
 import Input from 'components/atoms/Input';
 import Text from 'components/atoms/Text';
+import useInputs from 'hooks/useInputs';
 
 type SigninFormProps = {
   navigation: StackNavigationProp<RootStackParamList & AuthStackParamList>;
 };
 
 const SigninForm = ({navigation}: SigninFormProps) => {
+  const {values, handleChange, clearInputs} = useInputs<{
+    email: string;
+    password: string;
+  }>({email: '', password: ''});
   const passwordRef = useRef<TextInput>(null);
-  const [inputs, setInputs] = useState({email: '', password: ''});
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const isValidForm = inputs.email.length > 0 && inputs.password.length > 0;
+  const isValidForm = values.email.length > 0 && values.password.length > 0;
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     setIsLoading(true);
 
-    const payload = {email: inputs.email, password: inputs.password};
-    await Api.auth.signinWithLocal(payload, response => {
+    const payload = {email: values.email, password: values.password};
+    Api.auth.signinWithLocal(payload, response => {
       if (response.type === ResponseType.SUCCESS) {
         const {accessToken, refreshToken} = response.data;
         saveTokensToStorage(accessToken, refreshToken);
-        setInputs({email: '', password: ''});
+        clearInputs();
         navigation.navigate('Home');
       } else {
         Alert.alert('로그인 실패', response.message, [{text: '확인'}]);
@@ -58,19 +62,19 @@ const SigninForm = ({navigation}: SigninFormProps) => {
           <View style={styles.inputWrapper}>
             <Input
               placeholder="이메일"
-              value={inputs.email}
+              value={values.email}
               maxLength={300}
               autoFocus
-              onChangeText={value => setInputs({...inputs, email: value})}
+              onChangeText={text => handleChange('email', text)}
               onSubmitEditing={() => passwordRef.current?.focus()}
             />
             <Input
               ref={passwordRef}
               type="password"
               placeholder="비밀번호"
-              value={inputs.password}
+              value={values.password}
               maxLength={30}
-              onChangeText={value => setInputs({...inputs, password: value})}
+              onChangeText={text => handleChange('password', text)}
               onSubmitEditing={handleSubmit}
             />
             <TouchableOpacity

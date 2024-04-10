@@ -1,6 +1,7 @@
-import {TouchableOpacity} from 'react-native';
+import {Pressable} from 'react-native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {AuthStackParamList} from 'types/navigation';
+import {HIT_SLOP} from 'constants/theme';
 import Icon from 'components/atoms/Icon';
 import SignupForm from 'components/orginisms/form/SignupForm';
 import DefaultLayout from 'layouts/DefaultLayout';
@@ -15,9 +16,9 @@ const SignupScreen = ({navigation}: SignupScreenProps) => {
       isSafeAreaView
       headerTitle="회원가입"
       headerLeftContent={
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Pressable hitSlop={HIT_SLOP} onPress={() => navigation.goBack()}>
           <Icon name="arrow_back" />
-        </TouchableOpacity>
+        </Pressable>
       }>
       <SignupForm navigation={navigation} />
     </DefaultLayout>

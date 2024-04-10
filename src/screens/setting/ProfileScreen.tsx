@@ -1,14 +1,17 @@
-import {StyleSheet, TouchableOpacity, View, useColorScheme} from 'react-native';
+import {Alert, Pressable, StyleSheet, View, useColorScheme} from 'react-native';
+import {useEffect, useState} from 'react';
+import Api from 'libs/axios/api';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {SettingStackParamList} from 'types/navigation';
-import {Colors} from 'constants/theme';
+import {ResponseType, SigninProviderType} from 'types/common';
+import {RootStackParamList, SettingStackParamList} from 'types/navigation';
+import {Colors, HIT_SLOP} from 'constants/theme';
 import Icon from 'components/atoms/Icon';
 import Text from 'components/atoms/Text';
 import ListItem from 'components/molecules/ListItem';
 import DefaultLayout from 'layouts/DefaultLayout';
 
 type ProfileScreenProps = {
-  navigation: StackNavigationProp<SettingStackParamList>;
+  navigation: StackNavigationProp<RootStackParamList & SettingStackParamList>;
 };
 
 const ProfileScreen = ({navigation}: ProfileScreenProps) => {
@@ -20,74 +23,113 @@ const ProfileScreen = ({navigation}: ProfileScreenProps) => {
     : Colors.light.surface;
   const dangerColor = isDarkMode ? Colors.dark.error : Colors.light.error;
 
-  // TODO: 회원정보 email, 로그인수단 확인해서 비밀번호 변경 메뉴 표시
+  const [userData, setUserData] = useState<{
+    email: string;
+    name: string;
+    provider: SigninProviderType;
+  }>();
 
-  const handlePressWithdraw = async () => {
-    //TODO: 회원탈퇴 API 연동
+  const getUserData = () => {
+    Api.user.getUser(undefined, response => {
+      if (response.type === ResponseType.SUCCESS) {
+        setUserData(response.data);
+      } else {
+        Alert.alert('요청실패', response.message, [{text: '확인'}]);
+      }
+    });
   };
+
+  const withdrawMember = () => {
+    Api.user.deleteUser(undefined, response => {
+      if (response.type === ResponseType.SUCCESS) {
+        navigation.navigate('Auth');
+        Alert.alert('회원탈퇴', response.message, [{text: '확인'}]);
+      }
+    });
+  };
+
+  const handlePressWithdraw = () => {
+    Alert.alert('회원탈퇴', '정말 탈퇴하시겠습니까?', [
+      {text: '취소', style: 'cancel'},
+      {text: '탈퇴', style: 'destructive', onPress: withdrawMember},
+    ]);
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', getUserData);
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <DefaultLayout
       headerTitle="계정 정보"
       headerLeftContent={
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Pressable hitSlop={HIT_SLOP} onPress={() => navigation.goBack()}>
           <Icon name="arrow_back" size={20} />
-        </TouchableOpacity>
+        </Pressable>
       }>
-      <View>
-        <Text caption style={styles.listTitle}>
-          프로필
-        </Text>
-        <View
-          style={[
-            styles.listWrapper,
-            {borderColor: borderColor, backgroundColor: listBackgroundColor},
-          ]}>
-          <ListItem
-            title="myyun1029@gmail.com"
-            startContent={
-              <Text body style={styles.listItem}>
-                로그인 ID
-              </Text>
-            }
-          />
+      {userData && (
+        <View>
+          <Text caption style={styles.listTitle}>
+            프로필
+          </Text>
+          <View
+            style={[
+              styles.listWrapper,
+              {borderColor: borderColor, backgroundColor: listBackgroundColor},
+            ]}>
+            <ListItem
+              title={userData.email}
+              startContent={
+                <Text body style={styles.listItem}>
+                  로그인 ID
+                </Text>
+              }
+            />
+          </View>
+          <Text caption style={styles.listTitle}>
+            회원 정보 수정
+          </Text>
+          <View
+            style={[
+              styles.listWrapper,
+              {borderColor: borderColor, backgroundColor: listBackgroundColor},
+            ]}>
+            <ListItem
+              title={userData.name}
+              startContent={
+                <Text body style={styles.listItem}>
+                  닉네임 변경
+                </Text>
+              }
+              endContent={<Icon name="expand_move" />}
+              onPress={() => navigation.navigate('ProfileNickname')}
+            />
+            <ListItem
+              title="비밀번호 변경"
+              visible={userData.provider === SigninProviderType.LOCAL}
+              endContent={<Icon name="expand_move" />}
+              onPress={() => navigation.navigate('ProfilePassword')}
+            />
+          </View>
+          <Text caption style={styles.listTitle} />
+          <View
+            style={[
+              styles.listWrapper,
+              {borderColor: borderColor, backgroundColor: listBackgroundColor},
+            ]}>
+            <ListItem
+              startContent={
+                <Text body style={{color: dangerColor}}>
+                  회원 탈퇴
+                </Text>
+              }
+              endContent={<Icon name="expand_move" />}
+              onPress={handlePressWithdraw}
+            />
+          </View>
         </View>
-        <Text caption style={styles.listTitle}>
-          회원 정보 수정
-        </Text>
-        <View
-          style={[
-            styles.listWrapper,
-            {borderColor: borderColor, backgroundColor: listBackgroundColor},
-          ]}>
-          <ListItem
-            title="닉네임 변경"
-            endContent={<Icon name="expand_move" />}
-            onPress={() => navigation.navigate('ProfileNickname')}
-          />
-          <ListItem
-            title="비밀번호 변경"
-            endContent={<Icon name="expand_move" />}
-            onPress={() => navigation.navigate('ProfilePassword')}
-          />
-        </View>
-        <Text caption style={styles.listTitle} />
-        <View
-          style={[
-            styles.listWrapper,
-            {borderColor: borderColor, backgroundColor: listBackgroundColor},
-          ]}>
-          <ListItem
-            startContent={
-              <Text body style={{color: dangerColor}}>
-                회원 탈퇴
-              </Text>
-            }
-            endContent={<Icon name="expand_move" />}
-            onPress={handlePressWithdraw}
-          />
-        </View>
-      </View>
+      )}
     </DefaultLayout>
   );
 };
