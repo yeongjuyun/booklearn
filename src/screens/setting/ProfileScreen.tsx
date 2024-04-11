@@ -34,7 +34,7 @@ const ProfileScreen = ({navigation}: ProfileScreenProps) => {
       if (response.type === ResponseType.SUCCESS) {
         setUserData(response.data);
       } else {
-        Alert.alert('요청실패', response.message, [{text: '확인'}]);
+        Alert.alert('', response.message, [{text: '확인'}]);
       }
     });
   };
@@ -86,6 +86,14 @@ const ProfileScreen = ({navigation}: ProfileScreenProps) => {
                 </Text>
               }
             />
+            <ListItem
+              title={userData.provider}
+              startContent={
+                <Text body style={styles.listItem}>
+                  연결된 계정
+                </Text>
+              }
+            />
           </View>
           <Text caption style={styles.listTitle}>
             회원 정보 수정
@@ -124,7 +132,6 @@ const ProfileScreen = ({navigation}: ProfileScreenProps) => {
                   회원 탈퇴
                 </Text>
               }
-              endContent={<Icon name="expand_move" />}
               onPress={handlePressWithdraw}
             />
           </View>

@@ -111,6 +111,7 @@ const Input: ForwardRefRenderFunction<TextInput, InputProps> = (
           secureTextEntry={type === 'password'}
           autoComplete="off"
           editable={!isDisabled}
+          selectionColor={Colors.primary}
           style={[styles.textInput, inputStyle]}
         />
         {endContent && <View style={styles.endContent}>{endContent}</View>}
@@ -132,7 +133,6 @@ const styles = StyleSheet.create({
   textInput: {
     flex: 1,
     fontSize: 16,
-    textAlignVertical: 'top',
   },
   iconWrapper: {marginRight: 4},
   startContent: {alignItems: 'center', paddingRight: 10},

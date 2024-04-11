@@ -1,8 +1,13 @@
 import * as KakaoLogin from '@react-native-seoul/kakao-login';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {
+  appleAuth,
+  appleAuthAndroid,
+} from '@invertase/react-native-apple-authentication';
 import {saveTokensToStorage} from 'libs/async-storage';
 import {Response, ResponseType} from 'types/common';
 import {DELETE, GET, POST, UPDATE} from './instance';
+import {Alert} from 'react-native';
 
 GoogleSignin.configure({
   webClientId:
@@ -48,6 +53,71 @@ const authApis = {
       });
     } catch (error) {
       console.log(error);
+    }
+  },
+  signinWithAppleForIos: async (
+    payload?: {},
+    callback?: (response: Response) => void,
+    navigation?: any,
+  ) => {
+    const appleAuthRequestResponse = await appleAuth.performRequest({
+      requestedOperation: appleAuth.Operation.LOGIN,
+      requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
+    });
+
+    console.log('appleAuthRequestResponse', appleAuthRequestResponse);
+    const credentialState = await appleAuth.getCredentialStateForUser(
+      appleAuthRequestResponse.user,
+    );
+
+    if (credentialState === appleAuth.State.AUTHORIZED) {
+      if (!appleAuth.isSupported)
+        return Alert.alert(
+          '애플 로그인 실패',
+          '애플 로그인을 지원하지 않는 기기입니다',
+          [{text: '확인'}],
+        );
+
+      // TODO: API 호출
+      const {authorizationCode, email} = appleAuthRequestResponse;
+      console.log('payload', email, authorizationCode);
+    }
+  },
+  signinWithAppleForAndroid: async (
+    payload?: {},
+    callback?: (response: Response) => void,
+    navigation?: any,
+  ) => {
+    // Generate secure, random values for state and nonce
+    // const rawNonce = uuid();
+    // const state = uuid();
+
+    try {
+      appleAuthAndroid.configure({
+        clientId: 'com.example.client-android',
+        redirectUri: 'https://example.com/auth/callback',
+        scope: appleAuthAndroid.Scope.ALL,
+        responseType: appleAuthAndroid.ResponseType.ALL,
+        nonce: 'random-nonce',
+        state: 'random-state',
+      });
+
+      const response = await appleAuthAndroid.signIn();
+      if (response) {
+        const code = response.code;
+        const id_token = response.id_token;
+        const user = response.user;
+        const state = response.state;
+        console.log('Got auth code', code);
+        console.log('Got id_token', id_token);
+        console.log('Got user', user);
+        console.log('Got state', state);
+        console.log('isSupported', appleAuthAndroid.isSupported);
+      }
+    } catch (error: any) {
+      if (error && error.message) {
+        Alert.alert('애플 로그인 실패', error.message, [{text: '확인'}]);
+      }
     }
   },
   signinWithLocal: async (

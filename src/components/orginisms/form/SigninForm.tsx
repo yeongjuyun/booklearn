@@ -63,8 +63,8 @@ const SigninForm = ({navigation}: SigninFormProps) => {
             <Input
               placeholder="이메일"
               value={values.email}
-              maxLength={300}
               autoFocus
+              maxLength={300}
               onChangeText={text => handleChange('email', text)}
               onSubmitEditing={() => passwordRef.current?.focus()}
             />

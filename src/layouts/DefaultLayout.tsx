@@ -1,18 +1,14 @@
-import {ReactNode, useEffect} from 'react';
+import {ReactNode} from 'react';
 import {
   NativeModules,
   Platform,
   SafeAreaView,
   StatusBar,
-  StyleSheet,
   View,
   useColorScheme,
 } from 'react-native';
 import {Colors} from 'constants/theme';
 import TopNavigation from 'components/molecules/TopNavigation';
-import {useNavigation} from '@react-navigation/native';
-import {getTokensFromStorage} from 'libs/async-storage';
-import {RootStackParamList} from 'types/navigation';
 
 const {StatusBarManager} = NativeModules;
 

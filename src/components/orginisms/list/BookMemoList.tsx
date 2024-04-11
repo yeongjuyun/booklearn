@@ -24,6 +24,7 @@ type BookMemoListProps = {
 const BookMemoList = ({navigation, data, bookId}: BookMemoListProps) => {
   const isDarkMode = useColorScheme() === 'dark';
   const neutralColor = isDarkMode ? Colors.dark.neutral : Colors.light.neutral;
+  const dividerColor = isDarkMode ? Colors.dark.surface : Colors.light.surface;
 
   const renderItem = ({item, index}: {item: BookMemo; index: number}) => {
     const isLastItem = index === data.length - 1;
@@ -34,7 +35,7 @@ const BookMemoList = ({navigation, data, bookId}: BookMemoListProps) => {
           <View style={styles.itemHeader}>
             <Chip>{item.page ? `P. ${item.page}` : '미지정'}</Chip>
             <View style={styles.itemHeaderLeft}>
-              <Text caption>{formatDateTime(item.createdAt, 'date')}</Text>
+              <Text caption>{formatDateTime(item.createdAt, 'relative')}</Text>
               <Pressable
                 hitSlop={HIT_SLOP}
                 onPress={() =>
@@ -51,7 +52,7 @@ const BookMemoList = ({navigation, data, bookId}: BookMemoListProps) => {
             {item.content}
           </Text>
         </View>
-        <Divider color={neutralColor} />
+        <Divider width={1} color={dividerColor} />
         {isLastItem && <View style={{marginBottom: 50}} />}
       </View>
     );

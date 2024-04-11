@@ -60,9 +60,13 @@ function BookEssayDetailScreen({navigation}: BookEssayDetailProps) {
         </ScrollView>
       ) : (
         <View style={styles.ViewWrapper}>
-          <Image source={EssayImage} style={styles.essayImage} />
+          <Image
+            source={EssayImage}
+            resizeMode="contain"
+            style={styles.essayImage}
+          />
           <Text caption style={styles.placeholder}>
-            상단 편집 버튼을 통해 에세이를 작성해보세요
+            우측 상단 편집 버튼을 통해 에세이를 작성해보세요
           </Text>
         </View>
       )}
@@ -83,8 +87,8 @@ const styles = StyleSheet.create({
     paddingBottom: 120,
   },
   essayImage: {
-    width: 240,
-    height: 240,
+    width: 200,
+    height: 200,
   },
   text: {
     paddingHorizontal: 16,

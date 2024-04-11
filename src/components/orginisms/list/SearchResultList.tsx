@@ -24,7 +24,7 @@ const SearchResultList = ({navigation, books}: SearchResultListProps) => {
   const postBooksToBookShelf = (isbn: string) => {
     Api.bookshelf.postBookshelf({isbnList: [isbn]}, response => {
       if (response.type === ResponseType.SUCCESS) {
-        navigation.navigate('Main');
+        navigation.navigate('Bookshelf');
       } else {
         Alert.alert('요청 실패', `${response.message}`);
       }

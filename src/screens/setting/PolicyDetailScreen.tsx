@@ -15,8 +15,8 @@ import {Policy, ResponseType} from 'types/common';
 import {SettingStackParamList} from 'types/navigation';
 import {Colors, HIT_SLOP} from 'constants/theme';
 import Icon from 'components/atoms/Icon';
-import DefaultLayout from 'layouts/DefaultLayout';
 import Spinner from 'components/atoms/Spinner';
+import DefaultLayout from 'layouts/DefaultLayout';
 
 type PolicyDetailScreenProps = {
   navigation: StackNavigationProp<SettingStackParamList>;

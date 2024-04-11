@@ -2,17 +2,19 @@ import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
   View,
-  TouchableOpacity,
   FlatList,
   TouchableHighlight,
   Image,
   Alert,
   Pressable,
+  useColorScheme,
 } from 'react-native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {getTokensFromStorage} from 'libs/async-storage';
 import Api from 'libs/axios/api';
 import NoImage from 'assets/image/noimage.png';
+import LogoBlack from 'assets/logo/logo-full-black.png';
+import LogoWhite from 'assets/logo/logo-full-white.png';
 import {ResponseType} from 'types/common';
 import {Colors, HIT_SLOP} from 'constants/theme';
 import {BookStackParamList, RootStackParamList} from 'types/navigation';
@@ -27,7 +29,10 @@ type BookNoteListScreenProps = {
 const margin = 1;
 const numColumns = 3;
 
-const BookNoteListScreen = ({navigation}: BookNoteListScreenProps) => {
+const BookshelfScreen = ({navigation}: BookNoteListScreenProps) => {
+  const isDarkMode = useColorScheme() === 'dark';
+  const LogoImage = isDarkMode ? LogoWhite : LogoBlack;
+
   const [containerWidth, setContainerWidth] = useState(0);
   const [books, setBooks] = useState();
 
@@ -43,7 +48,6 @@ const BookNoteListScreen = ({navigation}: BookNoteListScreenProps) => {
     const checkAccessToken = async () => {
       try {
         const {accessToken} = await getTokensFromStorage();
-        console.log('accessToken', accessToken);
         if (!accessToken) {
           navigation.navigate('Auth');
         } else {
@@ -51,7 +55,7 @@ const BookNoteListScreen = ({navigation}: BookNoteListScreenProps) => {
         }
       } catch (error) {
         Alert.alert('로그인 오류', '로그인 정보를 확인할 수 없습니다', [
-          {text: '확인'},
+          {text: '확인', onPress: () => navigation.navigate('Auth')},
         ]);
       }
     };
@@ -61,10 +65,7 @@ const BookNoteListScreen = ({navigation}: BookNoteListScreenProps) => {
   }, [navigation]);
 
   const headerLogo = (
-    <Text>
-      <Text style={[styles.logo]}>Book</Text>
-      <Text style={[styles.logo, {color: Colors.primary}]}>learn</Text>
-    </Text>
+    <Image source={LogoImage} resizeMode="contain" style={styles.logo} />
   );
 
   const headerMenuIcons = (
@@ -115,19 +116,19 @@ const BookNoteListScreen = ({navigation}: BookNoteListScreenProps) => {
     </DefaultLayout>
   );
 };
-export default BookNoteListScreen;
+export default BookshelfScreen;
 
 const styles = StyleSheet.create({
+  logo: {
+    width: 120,
+  },
   emptyListContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 30,
   },
-  logo: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
+
   flatListColumnWrapper: {
     gap: margin,
     marginBottom: 1,

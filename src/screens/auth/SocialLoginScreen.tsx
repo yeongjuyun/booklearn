@@ -1,4 +1,3 @@
-import {useState} from 'react';
 import {
   StyleSheet,
   View,
@@ -6,17 +5,16 @@ import {
   Image,
   useColorScheme,
   Pressable,
-  Modal,
-  ScrollView,
-  useWindowDimensions,
+  Platform,
 } from 'react-native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import RenderHtml from 'react-native-render-html';
+import {appleAuthAndroid} from '@invertase/react-native-apple-authentication';
 import Api from 'libs/axios/api';
-import {ResponseType} from 'types/common';
+import LogoBlack from 'assets/logo/logo-full-black.png';
+import LogoWhite from 'assets/logo/logo-full-white.png';
 import {RootStackParamList, AuthStackParamList} from 'types/navigation';
-import BookImage from 'assets/image/books.png';
 import {Colors, HIT_SLOP} from 'constants/theme';
+import {openExternalLink} from 'utils/common';
 import Icon from 'components/atoms/Icon';
 import Text from 'components/atoms/Text';
 import Button from 'components/atoms/Button';
@@ -27,18 +25,11 @@ type SocialLoginScreenProps = {
 };
 
 function SocialLoginScreen({navigation}: SocialLoginScreenProps) {
-  const {width} = useWindowDimensions();
   const isDarkMode = useColorScheme() === 'dark';
   const appleButtonBorderColor = isDarkMode ? '#E0E0E9' : Colors.black;
   const appleButtonBackgroundColor = isDarkMode ? Colors.white : '#050708';
   const appleButtonTextColor = isDarkMode ? Colors.black : Colors.white;
-  const textColor = isDarkMode ? Colors.dark.text : Colors.light.text;
-  const modalBackgroundColor = isDarkMode
-    ? Colors.dark.background
-    : Colors.light.background;
-
-  const [policyData, setPolicyData] = useState<string>();
-  const [policyVisible, setPolicyVisible] = useState<boolean>(false);
+  const LogoImage = isDarkMode ? LogoWhite : LogoBlack;
 
   const signinWithKakao = () => {
     Api.auth.signinWithKakao(undefined, undefined, navigation);
@@ -48,30 +39,24 @@ function SocialLoginScreen({navigation}: SocialLoginScreenProps) {
     Api.auth.signinWidthGoogle(undefined, undefined, navigation);
   };
 
-  const fetchTermsOfService = () => {
-    Api.default.getTermsOfService({}, response => {
-      if (response.type === ResponseType.SUCCESS) {
-        setPolicyData(response.data);
-      }
-    });
-  };
-
-  const fetchPrivacyPolicy = () => {
-    Api.default.getPrivacyPolicy({}, response => {
-      if (response.type === ResponseType.SUCCESS) {
-        setPolicyData(response.data);
-      }
-    });
+  const signinWithApple = () => {
+    if (Platform.OS === 'ios') {
+      Api.auth.signinWithAppleForIos(undefined, undefined, navigation);
+    } else {
+      Api.auth.signinWithAppleForAndroid(undefined, undefined, navigation);
+    }
   };
 
   const handlePressTermsOfService = () => {
-    setPolicyVisible(true);
-    fetchTermsOfService();
+    openExternalLink(
+      'https://antique-playroom-7c4.notion.site/37cf16a4b75f493192009abdd6e4fbae?pvs=4',
+    );
   };
 
   const handlePressPrivacyPolicy = () => {
-    setPolicyVisible(true);
-    fetchPrivacyPolicy();
+    openExternalLink(
+      'https://antique-playroom-7c4.notion.site/fa3ff4fe50d943138b68584ff5bf2656?pvs=4',
+    );
   };
 
   return (
@@ -85,13 +70,11 @@ function SocialLoginScreen({navigation}: SocialLoginScreenProps) {
       }>
       <View style={styles.wrapper}>
         <View style={styles.logoWrapper}>
-          <Image source={BookImage} style={styles.logoImage} />
-          <View style={styles.logo}>
-            <Text h1>Book</Text>
-            <Text h1 style={{color: Colors.primary}}>
-              learn
-            </Text>
-          </View>
+          <Image
+            source={LogoImage}
+            resizeMode={'contain'}
+            style={styles.logoImage}
+          />
         </View>
         <View style={styles.innerWrapper}>
           <View style={{gap: 10}}>
@@ -103,18 +86,25 @@ function SocialLoginScreen({navigation}: SocialLoginScreenProps) {
               <Icon name="kakao_logo" size={18} />
               카카오로 계속하기
             </Button>
-            <Button
-              size="l"
-              style={{
-                borderWidth: 1,
-                borderColor: appleButtonBorderColor,
-                backgroundColor: appleButtonBackgroundColor,
-              }}
-              textStyle={{color: appleButtonTextColor}}
-              onPress={() => navigation.navigate('Home')}>
-              <Icon name="apple_logo" size={18} color={appleButtonTextColor} />
-              애플로 계속하기
-            </Button>
+            {(Platform.OS === 'ios' ||
+              (Platform.OS === 'android' && appleAuthAndroid.isSupported)) && (
+              <Button
+                size="l"
+                style={{
+                  borderWidth: 1,
+                  borderColor: appleButtonBorderColor,
+                  backgroundColor: appleButtonBackgroundColor,
+                }}
+                textStyle={{color: appleButtonTextColor}}
+                onPress={signinWithApple}>
+                <Icon
+                  name="apple_logo"
+                  size={18}
+                  color={appleButtonTextColor}
+                />
+                애플로 계속하기
+              </Button>
+            )}
             <Button
               size="l"
               style={{
@@ -134,7 +124,6 @@ function SocialLoginScreen({navigation}: SocialLoginScreenProps) {
               이메일로 계속하기
             </Button>
           </View>
-          {/* TODO: 이용약관 개인정보 처리방침 링크 추가 */}
           <Text caption numberOfLines={2} style={styles.caption}>
             로그인 시{' '}
             <TouchableOpacity
@@ -154,33 +143,6 @@ function SocialLoginScreen({navigation}: SocialLoginScreenProps) {
           </Text>
         </View>
       </View>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={policyVisible}
-        onRequestClose={() => setPolicyVisible(!policyVisible)}>
-        <DefaultLayout
-          headerLeftContent={
-            <Pressable
-              hitSlop={HIT_SLOP}
-              onPress={() => setPolicyVisible(false)}>
-              <Icon name="arrow_back" />
-            </Pressable>
-          }>
-          <ScrollView
-            style={[
-              styles.modalWrapper,
-              {backgroundColor: modalBackgroundColor},
-            ]}>
-            <RenderHtml
-              contentWidth={width}
-              source={{html: policyData || ''}}
-              baseStyle={{color: textColor}}
-            />
-            <View style={styles.modalBottomSpacing} />
-          </ScrollView>
-        </DefaultLayout>
-      </Modal>
     </DefaultLayout>
   );
 }
@@ -191,15 +153,13 @@ const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
   },
-  logoWrapper: {},
-  logoImage: {
-    width: 280,
-    height: 280,
-    alignSelf: 'center',
-  },
-  logo: {
-    flexDirection: 'row',
+  logoWrapper: {
+    flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logoImage: {
+    width: 300,
   },
   innerWrapper: {
     flex: 1,
@@ -221,10 +181,4 @@ const styles = StyleSheet.create({
   caption: {
     textAlign: 'center',
   },
-
-  modalWrapper: {
-    paddingHorizontal: 16,
-    backgroundColor: 'red',
-  },
-  modalBottomSpacing: {marginTop: 30},
 });

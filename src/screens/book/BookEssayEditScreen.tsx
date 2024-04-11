@@ -86,6 +86,21 @@ function BookEssayEditScreen({navigation}: BookEssayEditProps) {
     }
   };
 
+  const handlePressClose = () => {
+    if (values.content !== route.params?.essay.content) {
+      Alert.alert(
+        '',
+        '작성중인 내용이 저장되지 않았습니다. \n 작성을 취소하시겠습니까?',
+        [
+          {text: '취소', style: 'cancel'},
+          {text: '확인', onPress: () => navigation.goBack()},
+        ],
+      );
+    } else {
+      navigation.goBack();
+    }
+  };
+
   const handlePressDelete = () => {
     Alert.alert('삭제', '에세이를 삭제하시겠습니까?', [
       {text: '취소', style: 'cancel'},
@@ -97,7 +112,7 @@ function BookEssayEditScreen({navigation}: BookEssayEditProps) {
     <DefaultLayout
       headerTitle={values.id ? '에세이 수정' : '에세이 작성'}
       headerLeftContent={
-        <Pressable hitSlop={HIT_SLOP} onPress={() => navigation.goBack()}>
+        <Pressable hitSlop={HIT_SLOP} onPress={handlePressClose}>
           <Text body>닫기</Text>
         </Pressable>
       }

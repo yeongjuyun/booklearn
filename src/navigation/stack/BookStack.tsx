@@ -1,8 +1,8 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {BookStackParamList} from 'types/navigation';
 import {StackNavigationProp} from '@react-navigation/stack';
+import BookshelfScreen from 'screens/book/BookshlefScreen';
 import BookSearchScreen from 'screens/book/BookSearchScreen';
-import BookNoteListScreen from 'screens/book/BookNoteListScreen';
 import BookNoteDetailScreen from 'screens/book/BookNoteDetailScreen';
 import BookMemoEditScreen from 'screens/book/BookMemoEditScreen';
 import BookEssayEditScreen from 'screens/book/BookEssayEditScreen';
@@ -17,7 +17,7 @@ export const BookStack = ({
 }) => {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
-      <Stack.Screen name="Main" component={BookNoteListScreen} />
+      <Stack.Screen name="Bookshelf" component={BookshelfScreen} />
       <Stack.Screen name="Search" component={BookSearchScreen} />
       <Stack.Screen name="Detail" component={BookNoteDetailScreen} />
       <Stack.Screen name="Essay" component={BookEssayDetailScreen} />

@@ -52,11 +52,6 @@ const SettingScreen = ({navigation}: SettingScreenProps) => {
     }
   };
 
-  const handlePressLogout = () => {
-    removeTokensFromStorage();
-    navigation.navigate('Auth');
-  };
-
   const fetchAppVersion = () => {
     Api.default.getAppVersions(undefined, response => {
       if (response.type === ResponseType.SUCCESS) {
@@ -70,6 +65,12 @@ const SettingScreen = ({navigation}: SettingScreenProps) => {
     const unsubscribe = navigation.addListener('focus', fetchAppVersion);
     return unsubscribe;
   }, [navigation]);
+
+  const handlePressLogout = () => {
+    removeTokensFromStorage(() => {
+      navigation.navigate('Auth');
+    });
+  };
 
   return (
     <DefaultLayout

@@ -8,6 +8,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
+  useColorScheme,
 } from 'react-native';
 import {RouteProp, useRoute} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -33,6 +34,12 @@ type BookNoteDetailScreenRouteProp = RouteProp<BookStackParamList, 'Detail'>;
 
 const BookNoteDetailScreen = ({navigation}: BookNoteDetailScreenProps) => {
   const route = useRoute<BookNoteDetailScreenRouteProp>();
+
+  const isDarkMode = useColorScheme() === 'dark';
+  const bookCoverBorderColor = isDarkMode
+    ? Colors.dark.border
+    : Colors.light.border;
+
   const [bookDetail, setBookDetail] = useState<Book>();
   const [memoSortType, setMemoSortType] = useState<MemoSortType>(
     MemoSortType.LATEST,
@@ -91,7 +98,7 @@ const BookNoteDetailScreen = ({navigation}: BookNoteDetailScreenProps) => {
             essay: essay,
           });
         } else {
-          Alert.alert('조회 실패', response.message, [{text: '확인'}]);
+          Alert.alert('', response.message, [{text: '확인'}]);
         }
       });
     };
@@ -102,11 +109,9 @@ const BookNoteDetailScreen = ({navigation}: BookNoteDetailScreenProps) => {
 
   const deleteBook = () => {
     if (!bookDetail?.bookshelfId) {
-      return Alert.alert(
-        '요청 실패',
-        '책을 삭제하는 동안 오류가 발생했습니다',
-        [{text: '확인'}],
-      );
+      return Alert.alert('', '책을 삭제하는 동안 오류가 발생했습니다', [
+        {text: '확인'},
+      ]);
     }
 
     setIsLoading(true);
@@ -114,9 +119,9 @@ const BookNoteDetailScreen = ({navigation}: BookNoteDetailScreenProps) => {
     const payload = {id: bookDetail.bookshelfId};
     Api.bookshelf.deleteBookshelfById(payload, response => {
       if (response.type === ResponseType.SUCCESS) {
-        navigation.navigate('Main');
+        navigation.navigate('Bookshelf');
       } else {
-        Alert.alert('삭제 실패', response.message, [{text: '확인'}]);
+        Alert.alert('', response.message, [{text: '확인'}]);
       }
       handleCancelSetting();
       setIsLoading(false);
@@ -188,7 +193,7 @@ const BookNoteDetailScreen = ({navigation}: BookNoteDetailScreenProps) => {
                 <View style={styles.bookDetailWrapper}>
                   <Image
                     source={{uri: bookDetail.cover}}
-                    style={styles.cover}
+                    style={[styles.cover, {borderColor: bookCoverBorderColor}]}
                   />
                   <View style={styles.bookInfoWrapper}>
                     <Text h4 numberOfLines={2}>
@@ -284,6 +289,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 170,
     borderRadius: 8,
+    borderWidth: 1,
     resizeMode: 'cover',
   },
   bookInfoWrapper: {

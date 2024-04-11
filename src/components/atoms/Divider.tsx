@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, StyleSheet, ViewProps, StyleProp, ViewStyle} from 'react-native';
-import {theme} from 'constants/theme';
+import {Colors} from 'constants/theme';
 
 export interface DividerProps extends ViewProps {
   orientation?: 'horizontal' | 'vertical';
@@ -44,7 +44,7 @@ export default Divider;
 const styles = StyleSheet.create({
   divider: {
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: theme.colors.white,
+    borderBottomColor: Colors.white,
   },
   inset: {
     marginLeft: 72,
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   vertical: {
     borderBottomWidth: 0,
     borderRightWidth: StyleSheet.hairlineWidth,
-    borderRightColor: theme.colors.white,
+    borderRightColor: Colors.white,
     height: 'auto',
     alignSelf: 'stretch',
   },

@@ -33,10 +33,11 @@ export const getTokensFromStorage = async () => {
   }
 };
 
-export const removeTokensFromStorage = async () => {
+export const removeTokensFromStorage = async (onSuccess?: Function) => {
   try {
     await AsyncStorage.removeItem('refreshToken');
     await AsyncStorage.removeItem('accessToken');
+    onSuccess?.();
     console.log('User logged out.');
   } catch (error) {
     console.log('Error logging out:', error);

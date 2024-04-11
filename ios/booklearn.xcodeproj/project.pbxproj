@@ -498,7 +498,7 @@
 				DEVELOPMENT_TEAM = 8AVFVJLV5P;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = booklearn/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Booklearn;
+				INFOPLIST_KEY_CFBundleDisplayName = "북런";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.books";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -529,7 +529,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8AVFVJLV5P;
 				INFOPLIST_FILE = booklearn/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Booklearn;
+				INFOPLIST_KEY_CFBundleDisplayName = "북런";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.books";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
