@@ -3,6 +3,10 @@
 #import <React/RCTBundleURLProvider.h>
 
 #import <RNKakaoLogins.h>
+
+// Splash Screen
+#import "RNSplashScreen.h"
+
 // Google Login
 #import <Firebase.h>
 
@@ -19,7 +23,11 @@
   // They will be passed down to the ViewController used by React Native.
   self.initialProps = @{};
 
-  return [super application:application didFinishLaunchingWithOptions:launchOptions];
+  // Splash Screen
+  [super application:application didFinishLaunchingWithOptions:launchOptions];
+  [RNSplashScreen show];
+  
+  return YES;
 }
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge

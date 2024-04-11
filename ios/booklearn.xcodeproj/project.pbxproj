@@ -41,6 +41,7 @@
 		19F6CBCC0A4E27FBF8BF4A61 /* libPods-booklearn-booklearnTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-booklearn-booklearnTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		24F1E0052BBE31BA00CB7D58 /* booklearn-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "booklearn-Bridging-Header.h"; sourceTree = "<group>"; };
 		24F1E0062BBE31BB00CB7D58 /* SwiftBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftBridge.swift; sourceTree = "<group>"; };
+		343B1F2A2BC6B0A400842E26 /* booklearn.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = booklearn.entitlements; path = booklearn/booklearn.entitlements; sourceTree = "<group>"; };
 		34F9658F2BC25E0B00B58350 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		3B4392A12AC88292D35C810B /* Pods-booklearn.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-booklearn.debug.xcconfig"; path = "Target Support Files/Pods-booklearn/Pods-booklearn.debug.xcconfig"; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-booklearn.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-booklearn.release.xcconfig"; path = "Target Support Files/Pods-booklearn/Pods-booklearn.release.xcconfig"; sourceTree = "<group>"; };
@@ -91,6 +92,7 @@
 		13B07FAE1A68108700A75B9A /* booklearn */ = {
 			isa = PBXGroup;
 			children = (
+				343B1F2A2BC6B0A400842E26 /* booklearn.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -491,10 +493,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = booklearn/booklearn.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = LHPKX8U9XD;
+				DEVELOPMENT_TEAM = 8AVFVJLV5P;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = booklearn/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Booklearn;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.books";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -505,7 +510,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.booklearn;
+				PRODUCT_BUNDLE_IDENTIFIER = com.zipcoker.booklearn;
 				PRODUCT_NAME = booklearn;
 				SWIFT_OBJC_BRIDGING_HEADER = "booklearn-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -520,9 +525,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = booklearn/booklearn.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = LHPKX8U9XD;
+				DEVELOPMENT_TEAM = 8AVFVJLV5P;
 				INFOPLIST_FILE = booklearn/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Booklearn;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.books";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -533,7 +541,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.booklearn;
+				PRODUCT_BUNDLE_IDENTIFIER = com.zipcoker.booklearn;
 				PRODUCT_NAME = booklearn;
 				SWIFT_OBJC_BRIDGING_HEADER = "booklearn-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
