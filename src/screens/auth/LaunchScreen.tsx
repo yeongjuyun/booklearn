@@ -1,5 +1,7 @@
+import {useCallback} from 'react';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {Image, StyleSheet, View} from 'react-native';
+import {useFocusEffect} from '@react-navigation/native';
+import {BackHandler, Image, StyleSheet, View} from 'react-native';
 import {AuthStackParamList} from 'types/navigation';
 import BookImage from 'assets/image/books2.png';
 import LogoGray from 'assets/logo/logo-full-gray.png';
@@ -12,6 +14,19 @@ type LaunchScreenProps = {
 };
 
 const LaunchScreen = ({navigation}: LaunchScreenProps) => {
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        BackHandler.exitApp();
+        return true;
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, []),
+  );
+
   return (
     <View style={styles.base}>
       <View style={styles.topSection}>

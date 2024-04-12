@@ -1,5 +1,5 @@
 import React, {forwardRef, useImperativeHandle, useRef, useState} from 'react';
-import {View, StyleSheet, KeyboardAvoidingView, Platform} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import useSWR from 'swr';
 import Api from 'libs/axios/api';
 import {ResponseType} from 'types/common';

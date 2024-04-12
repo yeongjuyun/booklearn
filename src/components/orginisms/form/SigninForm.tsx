@@ -79,14 +79,20 @@ const SigninForm = ({navigation}: SigninFormProps) => {
             />
             <TouchableOpacity
               style={styles.findPasswordLink}
-              onPress={() => navigation.push('PasswordFind')}>
+              onPress={() => {
+                Keyboard.dismiss();
+                navigation.push('PasswordFind');
+              }}>
               <Text sub>비밀번호 찾기</Text>
             </TouchableOpacity>
           </View>
           <View>
             <Pressable
               style={styles.signupLink}
-              onPress={() => navigation.push('Signup')}>
+              onPress={() => {
+                Keyboard.dismiss();
+                navigation.push('Signup');
+              }}>
               <Text body>회원이 아니신가요? </Text>
               <Text body style={{color: Colors.primary}}>
                 회원가입

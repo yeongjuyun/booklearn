@@ -1,4 +1,4 @@
-export const HIT_SLOP = {top: 8, left: 8, right: 8, bottom: 8};
+export const HIT_SLOP = {top: 10, left: 10, right: 10, bottom: 10};
 
 export const Colors = {
   primary: '#6B4EFF',
