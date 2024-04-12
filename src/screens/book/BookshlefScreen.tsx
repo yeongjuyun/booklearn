@@ -16,7 +16,8 @@ import NoImage from 'assets/image/noimage.png';
 import LogoBlack from 'assets/logo/logo-full-black.png';
 import LogoWhite from 'assets/logo/logo-full-white.png';
 import {ResponseType} from 'types/common';
-import {Colors, HIT_SLOP} from 'constants/theme';
+import {Book} from 'types/book';
+import {HIT_SLOP} from 'constants/theme';
 import {BookStackParamList, RootStackParamList} from 'types/navigation';
 import Text from 'components/atoms/Text';
 import Icon from 'components/atoms/Icon';
@@ -34,7 +35,7 @@ const BookshelfScreen = ({navigation}: BookNoteListScreenProps) => {
   const LogoImage = isDarkMode ? LogoWhite : LogoBlack;
 
   const [containerWidth, setContainerWidth] = useState(0);
-  const [books, setBooks] = useState();
+  const [books, setBooks] = useState<Book[]>();
 
   const getBookshelf = () => {
     Api.bookshelf.getBookshelf(undefined, response => {
@@ -87,32 +88,35 @@ const BookshelfScreen = ({navigation}: BookNoteListScreenProps) => {
     <DefaultLayout
       headerLeftContent={headerLogo}
       headerRightContent={headerMenuIcons}>
-      <FlatList
-        data={books}
-        ListEmptyComponent={
-          <View style={styles.emptyListContainer}>
-            <Text>조회된 책이 없습니다</Text>
-          </View>
-        }
-        columnWrapperStyle={styles.flatListColumnWrapper}
-        onLayout={e => setContainerWidth(e.nativeEvent.layout.width)}
-        numColumns={numColumns}
-        renderItem={({item}) => {
-          return (
-            <TouchableHighlight
-              onPress={() => navigation.navigate('Detail', {id: `${item.id}`})}>
-              <Image
-                source={{uri: item.book.cover}}
-                defaultSource={NoImage}
-                style={{
-                  width: (containerWidth - margin * 2) / numColumns,
-                  height: 180,
-                }}
-              />
-            </TouchableHighlight>
-          );
-        }}
-      />
+      {Array.isArray(books) && books.length > 0 ? (
+        <FlatList
+          data={books}
+          columnWrapperStyle={styles.flatListColumnWrapper}
+          onLayout={e => setContainerWidth(e.nativeEvent.layout.width)}
+          numColumns={numColumns}
+          renderItem={({item}) => {
+            return (
+              <TouchableHighlight
+                onPress={() =>
+                  navigation.navigate('Detail', {id: `${item.id}`})
+                }>
+                <Image
+                  source={{uri: item.book.cover}}
+                  defaultSource={NoImage}
+                  style={{
+                    width: (containerWidth - margin * 2) / numColumns,
+                    height: 180,
+                  }}
+                />
+              </TouchableHighlight>
+            );
+          }}
+        />
+      ) : (
+        <View style={styles.emptyListContainer}>
+          <Text caption>조회된 책이 없습니다</Text>
+        </View>
+      )}
     </DefaultLayout>
   );
 };

@@ -1,5 +1,5 @@
 import React, {forwardRef, useImperativeHandle, useRef, useState} from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, KeyboardAvoidingView, Platform} from 'react-native';
 import useSWR from 'swr';
 import Api from 'libs/axios/api';
 import {ResponseType} from 'types/common';
@@ -162,6 +162,7 @@ const EmailVerificationForm = forwardRef<any, EmailVerificationFormProps>(
 export default EmailVerificationForm;
 
 const styles = StyleSheet.create({
+  base: {flex: 1},
   form: {flex: 1, justifyContent: 'space-between', paddingHorizontal: 16},
   inputWrapper: {gap: 12},
   buttonWrapper: {gap: 10},

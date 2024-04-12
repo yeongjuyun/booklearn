@@ -6,6 +6,26 @@ export enum MemoSortType {
 }
 
 export type Book = {
+  id: string;
+  userId: string;
+  bookId: string;
+  createdAt: string;
+  book: {
+    id: string;
+    title: string;
+    author: string;
+    pubDate: string;
+    desc: string;
+    isbn: string;
+    isbn13: string;
+    publisher: string;
+    cover: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+};
+
+export type BookDetail = {
   bookshelfId: string;
   id: string;
   isbn: string;

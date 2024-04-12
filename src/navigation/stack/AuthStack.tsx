@@ -17,7 +17,7 @@ export const AuthStack = ({
   return (
     <Stack.Navigator
       initialRouteName="Launch"
-      screenOptions={{headerShown: false}}>
+      screenOptions={{headerShown: false, animation: 'slide_from_right'}}>
       <Stack.Screen name="Social" component={SocialLoginScreen} />
       <Stack.Screen name="Launch" component={LaunchScreen} />
       <Stack.Screen name="Signin" component={SigninScreen} />

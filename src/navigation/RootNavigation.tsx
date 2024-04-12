@@ -10,7 +10,8 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 function RootNavigation() {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Navigator
+        screenOptions={{headerShown: false, animation: 'slide_from_right'}}>
         <Stack.Screen name="Home" component={BookStack} />
         <Stack.Screen name="Setting" component={SettingStack} />
         <Stack.Screen

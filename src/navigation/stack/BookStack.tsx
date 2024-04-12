@@ -16,7 +16,8 @@ export const BookStack = ({
   navigation: StackNavigationProp<BookStackParamList>;
 }) => {
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Navigator
+      screenOptions={{headerShown: false, animation: 'slide_from_right'}}>
       <Stack.Screen name="Bookshelf" component={BookshelfScreen} />
       <Stack.Screen name="Search" component={BookSearchScreen} />
       <Stack.Screen name="Detail" component={BookNoteDetailScreen} />
@@ -24,12 +25,20 @@ export const BookStack = ({
       <Stack.Screen
         name="EditMemo"
         component={BookMemoEditScreen}
-        options={{presentation: 'containedModal', gestureEnabled: false}}
+        options={{
+          presentation: 'containedModal',
+          animation: 'slide_from_bottom',
+          gestureEnabled: false,
+        }}
       />
       <Stack.Screen
         name="EditEssay"
         component={BookEssayEditScreen}
-        options={{presentation: 'containedModal', gestureEnabled: false}}
+        options={{
+          presentation: 'containedModal',
+          animation: 'slide_from_bottom',
+          gestureEnabled: false,
+        }}
       />
     </Stack.Navigator>
   );

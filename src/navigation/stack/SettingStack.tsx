@@ -19,8 +19,9 @@ export const SettingStack = ({
   navigation: StackNavigationProp<SettingStackParamList>;
 }) => {
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
-      <Stack.Screen name="Main" component={SettingScreen} />
+    <Stack.Navigator
+      screenOptions={{headerShown: false, animation: 'slide_from_right'}}>
+      <Stack.Screen name="SettingMain" component={SettingScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="ProfileNickname" component={ProfileNicknameScreen} />
       <Stack.Screen name="ProfilePassword" component={ProfilePasswordScreen} />

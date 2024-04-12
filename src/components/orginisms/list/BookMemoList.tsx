@@ -78,7 +78,6 @@ export default BookMemoList;
 const styles = StyleSheet.create({
   itemWrapper: {
     gap: 24,
-    paddingHorizontal: 16,
     paddingVertical: 24,
   },
   itemHeader: {

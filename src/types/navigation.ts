@@ -30,7 +30,7 @@ export type BookStackParamList = {
 };
 
 export type SettingStackParamList = {
-  Setting: undefined;
+  SettingMain: undefined;
   Profile: undefined;
   ProfileNickname: undefined;
   ProfilePassword: undefined;

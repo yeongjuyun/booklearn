@@ -275,6 +275,7 @@ export default BookNoteDetailScreen;
 const styles = StyleSheet.create({
   base: {
     flex: 1,
+    paddingHorizontal: 20,
   },
   spinnerWrapper: {
     flex: 1,
@@ -282,8 +283,8 @@ const styles = StyleSheet.create({
   },
   bookDetailWrapper: {
     flexDirection: 'row',
-    paddingHorizontal: 16,
-    paddingVertical: 15,
+    paddingBottom: 15,
+    gap: 15,
   },
   cover: {
     width: 120,
@@ -294,8 +295,6 @@ const styles = StyleSheet.create({
   },
   bookInfoWrapper: {
     flex: 1,
-    paddingHorizontal: 15,
-    justifyContent: 'space-between',
     gap: 4,
   },
   bookMemoWrapper: {},
@@ -303,7 +302,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
     paddingVertical: 8,
   },
   bookMemoSort: {
