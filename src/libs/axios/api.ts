@@ -39,16 +39,14 @@ const authApis = {
   ) => {
     try {
       await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
-      const {
-        user: {id, email},
-      } = await GoogleSignin.signIn();
-      POST('/users/sign-in/google', {id, email}, response => {
+      const {idToken} = await GoogleSignin.signIn();
+      POST('/users/sign-in/google', {idToken}, response => {
         if (response.type === ResponseType.SUCCESS) {
           const {accessToken, refreshToken} = response.data;
           saveTokensToStorage(accessToken, refreshToken);
           navigation.navigate('Home');
         } else {
-          console.log('구글 로그인 실패');
+          Alert.alert('', response.message);
         }
       });
     } catch (error) {
@@ -71,16 +69,25 @@ const authApis = {
     );
 
     if (credentialState === appleAuth.State.AUTHORIZED) {
-      if (!appleAuth.isSupported)
+      if (!appleAuth.isSupported) {
         return Alert.alert(
           '애플 로그인 실패',
           '애플 로그인을 지원하지 않는 기기입니다',
           [{text: '확인'}],
         );
+      }
 
-      // TODO: API 호출
-      const {authorizationCode, email} = appleAuthRequestResponse;
-      console.log('payload', email, authorizationCode);
+      const {identityToken} = appleAuthRequestResponse;
+      const payload = {idToken: identityToken};
+      POST('/users/sign-in/apple', payload, response => {
+        if (response.type === ResponseType.SUCCESS) {
+          const {accessToken, refreshToken} = response.data;
+          saveTokensToStorage(accessToken, refreshToken);
+          navigation.navigate('Home');
+        } else {
+          Alert.alert('', response.message);
+        }
+      });
     }
   },
   signinWithAppleForAndroid: async (
@@ -88,10 +95,6 @@ const authApis = {
     callback?: (response: Response) => void,
     navigation?: any,
   ) => {
-    // Generate secure, random values for state and nonce
-    // const rawNonce = uuid();
-    // const state = uuid();
-
     try {
       appleAuthAndroid.configure({
         clientId: 'com.example.client-android',
@@ -104,15 +107,18 @@ const authApis = {
 
       const response = await appleAuthAndroid.signIn();
       if (response) {
-        const code = response.code;
         const id_token = response.id_token;
-        const user = response.user;
-        const state = response.state;
-        console.log('Got auth code', code);
-        console.log('Got id_token', id_token);
-        console.log('Got user', user);
-        console.log('Got state', state);
-        console.log('isSupported', appleAuthAndroid.isSupported);
+
+        const payload = {idToken: id_token};
+        POST('/users/sign-in/apple', payload, response => {
+          if (response.type === ResponseType.SUCCESS) {
+            const {accessToken, refreshToken} = response.data;
+            saveTokensToStorage(accessToken, refreshToken);
+            navigation.navigate('Home');
+          } else {
+            Alert.alert('', response.message);
+          }
+        });
       }
     } catch (error: any) {
       if (error && error.message) {

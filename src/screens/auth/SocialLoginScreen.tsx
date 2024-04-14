@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoImage: {
-    width: 300,
+    width: 280,
   },
   innerWrapper: {
     flex: 1,

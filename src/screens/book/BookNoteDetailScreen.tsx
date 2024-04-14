@@ -15,7 +15,7 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import Api from 'libs/axios/api';
 import {ResponseType} from 'types/common';
 import {BookStackParamList} from 'types/navigation';
-import {Book, MemoSortType} from 'types/book';
+import {BookDetail, MemoSortType} from 'types/book';
 import {INIT_BOOK_MEMO} from 'constants/init';
 import {Colors, HIT_SLOP} from 'constants/theme';
 import Icon from 'components/atoms/Icon';
@@ -40,7 +40,7 @@ const BookNoteDetailScreen = ({navigation}: BookNoteDetailScreenProps) => {
     ? Colors.dark.border
     : Colors.light.border;
 
-  const [bookDetail, setBookDetail] = useState<Book>();
+  const [bookDetail, setBookDetail] = useState<BookDetail>();
   const [memoSortType, setMemoSortType] = useState<MemoSortType>(
     MemoSortType.LATEST,
   );
@@ -79,6 +79,8 @@ const BookNoteDetailScreen = ({navigation}: BookNoteDetailScreenProps) => {
     }
     return sortedMemos;
   }, [bookDetail, memoSortType]);
+
+  console.log('sortedBookMemoList', sortedBookMemoList);
 
   useEffect(() => {
     const fetchBookDetail = () => {
