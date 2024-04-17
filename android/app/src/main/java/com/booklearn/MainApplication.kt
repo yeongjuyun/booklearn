@@ -1,4 +1,4 @@
-package com.booklearn
+package com.zipcoker.booklearn
 
 import android.app.Application
 import com.facebook.react.PackageList

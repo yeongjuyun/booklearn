@@ -1,4 +1,4 @@
-package com.booklearn
+package com.zipcoker.booklearn
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

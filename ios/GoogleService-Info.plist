@@ -3,23 +3,23 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>33395763326-osvnrurhbolc4qo4rr2d54j0fvb9ho38.apps.googleusercontent.com</string>
+	<string>647582691314-sb9f6mliat4aob9lf7a7vumlt43it8tj.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.33395763326-osvnrurhbolc4qo4rr2d54j0fvb9ho38</string>
+	<string>com.googleusercontent.apps.647582691314-sb9f6mliat4aob9lf7a7vumlt43it8tj</string>
 	<key>ANDROID_CLIENT_ID</key>
-	<string>33395763326-rrgmoou2f7o8kmli52j1fvvfp13fvi1e.apps.googleusercontent.com</string>
+	<string>647582691314-279vaej6kpmdfmpe7d6od42gmgf9mbre.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
-	<string>AIzaSyBVALvoCiJPZVZFzy2-MPPvOyGIt_sy_9Y</string>
+	<string>AIzaSyC0_9hpoEDmEYpbjXFMEDik8BVlv1Srr20</string>
 	<key>GCM_SENDER_ID</key>
-	<string>33395763326</string>
+	<string>647582691314</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.booklearn</string>
+	<string>com.zipcoker.booklearn</string>
 	<key>PROJECT_ID</key>
-	<string>booklearn-58f92</string>
+	<string>booklearn-78142</string>
 	<key>STORAGE_BUCKET</key>
-	<string>booklearn-58f92.appspot.com</string>
+	<string>booklearn-78142.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -31,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:33395763326:ios:7c89041fecdb21edbc102f</string>
+	<string>1:647582691314:ios:00353ec34c623acd29c56b</string>
 </dict>
 </plist>

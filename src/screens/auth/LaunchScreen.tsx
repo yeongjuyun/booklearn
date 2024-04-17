@@ -67,23 +67,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#DAE2EB',
   },
   topSection: {
-    marginTop: 32,
     alignItems: 'center',
     zIndex: 10,
   },
   logo: {
-    // TODO: Background linear gradient 적용할지 고민
     color: '#AFBCCB',
   },
   logoImage: {width: 120},
   description: {
     alignItems: 'center',
-    marginTop: 18,
   },
   descriptionText: {},
   image: {
-    width: 400,
-    height: 400,
+    width: 380,
+    height: 380,
     alignSelf: 'center',
   },
   fullImage: {

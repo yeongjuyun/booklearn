@@ -1,48 +1,56 @@
 {
   "project_info": {
-    "project_number": "33395763326",
-    "project_id": "booklearn-58f92",
-    "storage_bucket": "booklearn-58f92.appspot.com"
+    "project_number": "647582691314",
+    "project_id": "booklearn-78142",
+    "storage_bucket": "booklearn-78142.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:33395763326:android:8a8e247e83f0bfcfbc102f",
+        "mobilesdk_app_id": "1:647582691314:android:c6e754bb74c4cbd529c56b",
         "android_client_info": {
-          "package_name": "com.booklearn"
+          "package_name": "com.zipcoker.booklearn"
         }
       },
       "oauth_client": [
         {
-          "client_id": "33395763326-rrgmoou2f7o8kmli52j1fvvfp13fvi1e.apps.googleusercontent.com",
+          "client_id": "647582691314-279vaej6kpmdfmpe7d6od42gmgf9mbre.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.booklearn",
+            "package_name": "com.zipcoker.booklearn",
             "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
           }
         },
         {
-          "client_id": "33395763326-gvhl1ois76oae40e2ofmort9ddac4vn1.apps.googleusercontent.com",
+          "client_id": "647582691314-eq3ch4vmavf4chat8tj8sa29t25fnpv4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zipcoker.booklearn",
+            "certificate_hash": "ef7a878aa2b30e9f6dc3328f329b9db5570822ad"
+          }
+        },
+        {
+          "client_id": "647582691314-uv9kff2krc3sbqtdd7ip3ftpqkdj19cg.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCdcTLDWf6BRbcAoWW-3G724_yanQypews"
+          "current_key": "AIzaSyBD4rmF0y9As6ReDnS9GJL3zBYsOWzu4SQ"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "33395763326-gvhl1ois76oae40e2ofmort9ddac4vn1.apps.googleusercontent.com",
+              "client_id": "647582691314-uv9kff2krc3sbqtdd7ip3ftpqkdj19cg.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "33395763326-osvnrurhbolc4qo4rr2d54j0fvb9ho38.apps.googleusercontent.com",
+              "client_id": "647582691314-sb9f6mliat4aob9lf7a7vumlt43it8tj.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.booklearn"
+                "bundle_id": "com.zipcoker.booklearn"
               }
             }
           ]

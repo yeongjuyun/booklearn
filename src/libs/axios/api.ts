@@ -11,7 +11,7 @@ import {Alert} from 'react-native';
 
 GoogleSignin.configure({
   webClientId:
-    '33395763326-gvhl1ois76oae40e2ofmort9ddac4vn1.apps.googleusercontent.com',
+    '647582691314-uv9kff2krc3sbqtdd7ip3ftpqkdj19cg.apps.googleusercontent.com',
 });
 
 const authApis = {
@@ -20,17 +20,25 @@ const authApis = {
     callback?: (response: Response) => void,
     navigation?: any,
   ) => {
-    const kakaoLoginResponse = await KakaoLogin.login();
-    const {accessToken} = kakaoLoginResponse;
-    await POST('/users/sign-in/kakao', {accessToken}, (response: Response) => {
-      if (response.type === ResponseType.SUCCESS) {
-        const {accessToken, refreshToken} = response.data;
-        saveTokensToStorage(accessToken, refreshToken);
-        navigation.navigate('Home');
-      } else {
-        console.log('카카오 로그인 실패');
-      }
-    });
+    try {
+      const kakaoLoginResponse = await KakaoLogin.login();
+      const {accessToken} = kakaoLoginResponse;
+      await POST(
+        '/users/sign-in/kakao',
+        {accessToken},
+        (response: Response) => {
+          if (response.type === ResponseType.SUCCESS) {
+            const {accessToken, refreshToken} = response.data;
+            saveTokensToStorage(accessToken, refreshToken);
+            navigation.navigate('Home');
+          } else {
+            Alert.alert('', response.message);
+          }
+        },
+      );
+    } catch (error) {
+      console.log(error);
+    }
   },
   signinWidthGoogle: async (
     payload?: {},
