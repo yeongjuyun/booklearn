@@ -2,6 +2,7 @@ import {Alert, Pressable, StyleSheet, View, useColorScheme} from 'react-native';
 import {useEffect, useState} from 'react';
 import Api from 'libs/axios/api';
 import {StackNavigationProp} from '@react-navigation/stack';
+import {removeTokensFromStorage} from 'libs/async-storage';
 import {ResponseType, SigninProviderType} from 'types/common';
 import {RootStackParamList, SettingStackParamList} from 'types/navigation';
 import {Colors, HIT_SLOP} from 'constants/theme';
@@ -42,8 +43,10 @@ const ProfileScreen = ({navigation}: ProfileScreenProps) => {
   const withdrawMember = () => {
     Api.user.deleteUser(undefined, response => {
       if (response.type === ResponseType.SUCCESS) {
-        navigation.navigate('Auth');
-        Alert.alert('회원탈퇴', response.message, [{text: '확인'}]);
+        removeTokensFromStorage(() => {
+          navigation.navigate('Auth');
+          Alert.alert('회원탈퇴', response.message, [{text: '확인'}]);
+        });
       }
     });
   };
