@@ -80,8 +80,6 @@ const BookNoteDetailScreen = ({navigation}: BookNoteDetailScreenProps) => {
     return sortedMemos;
   }, [bookDetail, memoSortType]);
 
-  console.log('sortedBookMemoList', sortedBookMemoList);
-
   useEffect(() => {
     const fetchBookDetail = () => {
       const payload = {bookshelfId: route.params.id};

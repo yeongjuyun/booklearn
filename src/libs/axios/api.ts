@@ -71,7 +71,6 @@ const authApis = {
       requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
     });
 
-    console.log('appleAuthRequestResponse', appleAuthRequestResponse);
     const credentialState = await appleAuth.getCredentialStateForUser(
       appleAuthRequestResponse.user,
     );
