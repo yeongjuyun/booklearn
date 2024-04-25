@@ -17,7 +17,10 @@ type SignupInputFormProps = {
 
 const SignupInputForm: React.FC<SignupInputFormProps> = ({navigation}) => {
   const {data: auth_signup_email_data, mutate: auth_signup_email_mutate} =
-    useSWR(SWR_KEY.auth.verify.email);
+    useSWR(SWR_KEY.auth.signup.verify.email);
+  const {mutate: auth_verify_done_mutate} = useSWR(
+    SWR_KEY.auth.signup.verify.done,
+  );
 
   const {values, errors, isValidLength, handleChange, clearInputs, setError} =
     useInputs({
@@ -61,6 +64,7 @@ const SignupInputForm: React.FC<SignupInputFormProps> = ({navigation}) => {
         Alert.alert('회원가입 실패', response.message, [{text: '확인'}]);
       }
       auth_signup_email_mutate(undefined);
+      auth_verify_done_mutate(undefined);
       setIsLoading(false);
     });
   };

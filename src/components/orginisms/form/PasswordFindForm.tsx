@@ -7,7 +7,7 @@ import {ResponseType} from 'types/common';
 import {AuthStackParamList} from 'types/navigation';
 import {SWR_KEY} from 'constants/swrKey';
 import Spinner from 'components/atoms/Spinner';
-import EmailVerificationForm from './EmailVerificationForm';
+import PasswordFindEmailVerificationForm from './PasswordFindEmailVerificationForm';
 
 type PasswordFindFormProps = {
   navigation: StackNavigationProp<AuthStackParamList>;
@@ -15,7 +15,10 @@ type PasswordFindFormProps = {
 
 const PasswordFindForm = ({navigation}: PasswordFindFormProps) => {
   const {data: auth_verify_email_data, mutate: auth_verify_email_mutate} =
-    useSWR(SWR_KEY.auth.verify.email);
+    useSWR(SWR_KEY.auth.passwordFind.verify.email);
+  const {mutate: auth_verify_done_mutate} = useSWR(
+    SWR_KEY.auth.passwordFind.verify.done,
+  );
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const resetPassword = () => {
@@ -26,6 +29,7 @@ const PasswordFindForm = ({navigation}: PasswordFindFormProps) => {
       if (response.type === ResponseType.SUCCESS) {
         navigation.navigate('Signin');
         auth_verify_email_mutate(undefined);
+        auth_verify_done_mutate(undefined);
         Alert.alert('비밀번호 초기화', response.message, [{text: '확인'}]);
       } else {
         Alert.alert('비밀번호 초기화 실패', response.message, [{text: '확인'}]);
@@ -43,7 +47,7 @@ const PasswordFindForm = ({navigation}: PasswordFindFormProps) => {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.base}>
-      <EmailVerificationForm
+      <PasswordFindEmailVerificationForm
         isSignup={false}
         onSuccessVerification={resetPassword}
       />

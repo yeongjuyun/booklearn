@@ -22,9 +22,11 @@ const EmailVerificationForm = forwardRef<any, EmailVerificationFormProps>(
     ref,
   ) => {
     const {mutate: auth_verify_email_mutate} = useSWR(
-      SWR_KEY.auth.verify.email,
+      SWR_KEY.auth.passwordFind.verify.email,
     );
-    const {mutate: auth_verify_done_mutate} = useSWR(SWR_KEY.auth.verify.done);
+    const {mutate: auth_verify_done_mutate} = useSWR(
+      SWR_KEY.auth.passwordFind.verify.done,
+    );
 
     const {
       values,

@@ -5,28 +5,24 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {AuthStackParamList} from 'types/navigation';
 import {SWR_KEY} from 'constants/swrKey';
 import SignupInputForm from './SignupInputForm';
-import EmailVerificationForm from './EmailVerificationForm';
+import SignupEmailVerificationForm from './SignupEmailVerificationForm';
 
 type SignupFormProps = {
   navigation: StackNavigationProp<AuthStackParamList>;
 };
 
 const SignupForm = ({navigation}: SignupFormProps) => {
-  const {data: auth_verify_done_data} = useSWR(SWR_KEY.auth.verify.done);
-
-  const SignupStepComponent = () => {
-    return auth_verify_done_data ? (
-      <SignupInputForm navigation={navigation} />
-    ) : (
-      <EmailVerificationForm isSignup={true} />
-    );
-  };
+  const {data: auth_verify_done_data} = useSWR(SWR_KEY.auth.signup.verify.done);
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.base}>
-      {SignupStepComponent()}
+      {auth_verify_done_data ? (
+        <SignupInputForm navigation={navigation} />
+      ) : (
+        <SignupEmailVerificationForm isSignup={true} />
+      )}
     </KeyboardAvoidingView>
   );
 };
