@@ -1,13 +1,13 @@
+import {Alert} from 'react-native';
+import {saveTokensToStorage} from 'libs/async-storage';
 import * as KakaoLogin from '@react-native-seoul/kakao-login';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {
   appleAuth,
   appleAuthAndroid,
 } from '@invertase/react-native-apple-authentication';
-import {saveTokensToStorage} from 'libs/async-storage';
 import {Response, ResponseType} from 'types/common';
-import {DELETE, GET, POST, UPDATE} from './instance';
-import {Alert} from 'react-native';
+import {GET, POST, UPDATE, DELETE} from './crud';
 
 GoogleSignin.configure({
   webClientId:

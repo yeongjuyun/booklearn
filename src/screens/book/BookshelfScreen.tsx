@@ -55,7 +55,7 @@ const BookshelfScreen = ({navigation}: BookNoteListScreenProps) => {
           getBookshelf();
         }
       } catch (error) {
-        Alert.alert('로그인 오류', '로그인 정보를 확인할 수 없습니다', [
+        Alert.alert('', '로그인 정보를 확인할 수 없습니다', [
           {text: '확인', onPress: () => navigation.navigate('Auth')},
         ]);
       }
