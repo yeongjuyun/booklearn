@@ -44,7 +44,7 @@ const SignupInputForm: React.FC<SignupInputFormProps> = ({navigation}) => {
 
     if (password !== passwordConfirm) {
       passwordConfirmInputRef.current?.focus();
-      return setError('password', '비밀번호가 일치하지 않습니다');
+      return setError('passwordConfirm', '비밀번호가 일치하지 않습니다');
     }
 
     const payload = {
