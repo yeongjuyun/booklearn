@@ -1,11 +1,10 @@
+import {Pressable} from 'react-native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import Icon from 'components/atoms/Icon';
-import Text from 'components/atoms/Text';
-import InquireForm from 'components/orginisms/form/InquireForm';
-import {HIT_SLOP} from 'constants/theme';
-import DefaultLayout from 'layouts/DefaultLayout';
-import {Pressable, View} from 'react-native';
 import {SettingStackParamList} from 'types/navigation';
+import {HIT_SLOP} from 'constants/theme';
+import Icon from 'components/atoms/Icon';
+import InquireForm from 'components/orginisms/form/InquireForm';
+import DefaultLayout from 'layouts/DefaultLayout';
 
 type InquireScreenProps = {
   navigation: StackNavigationProp<SettingStackParamList>;

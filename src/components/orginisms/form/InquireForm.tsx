@@ -1,10 +1,12 @@
 import {useState} from 'react';
 import {
   Alert,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
   StyleSheet,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -58,30 +60,34 @@ const InquireForm = ({navigation}: InquireFormProps) => {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.base}>
-      <View style={styles.form}>
-        <View style={styles.inputWrapper}>
-          <Select
-            placeholder="카테고리 선택"
-            options={CategoryTypeOptions}
-            onChangeOption={handleChangeCategoryOption}
-          />
-          <Input
-            placeholder="내용을 입력해주세요"
-            value={values.content}
-            multiline
-            style={styles.textarea}
-            onChangeText={text => handleChange('content', text)}
-          />
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.form}>
+          <View style={styles.inputWrapper}>
+            <Select
+              placeholder="카테고리 선택"
+              options={CategoryTypeOptions}
+              onChangeOption={handleChangeCategoryOption}
+            />
+            <Input
+              placeholder="내용을 입력해주세요"
+              value={values.content}
+              multiline
+              style={styles.textarea}
+              onChangeText={text => handleChange('content', text)}
+            />
+          </View>
+          <SafeAreaView>
+            <Button
+              size="l"
+              isLoading={isLoading}
+              disabled={!isValidLength.category || !isValidLength.content}
+              style={styles.submitButton}
+              onPress={handlePressSubmit}>
+              제출
+            </Button>
+          </SafeAreaView>
         </View>
-        <Button
-          size="l"
-          isLoading={isLoading}
-          disabled={!isValidLength.category || !isValidLength.content}
-          style={styles.submitButton}
-          onPress={handlePressSubmit}>
-          제출
-        </Button>
-      </View>
+      </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 };
@@ -91,7 +97,7 @@ export default InquireForm;
 const styles = StyleSheet.create({
   base: {flex: 1},
   form: {flex: 1, justifyContent: 'space-between', paddingHorizontal: 16},
-  inputWrapper: {gap: 10},
+  inputWrapper: {gap: 12},
   textarea: {
     height: 200,
     alignItems: 'flex-start',
