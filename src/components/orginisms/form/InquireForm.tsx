@@ -3,6 +3,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
   StyleSheet,
   View,
 } from 'react-native';
@@ -17,9 +18,9 @@ import Select from 'components/atoms/Select';
 import Input from 'components/atoms/Input';
 
 const CategoryTypeOptions = [
-  {key: 'account', value: '계정'},
-  {key: 'system', value: '시스템'},
-  {key: 'etc', value: '기타'},
+  {key: 'account', value: '계정 문의'},
+  {key: 'system', value: '시스템 문의'},
+  {key: 'etc', value: '기타 문의'},
 ];
 
 type InquireFormProps = {
@@ -92,11 +93,11 @@ const styles = StyleSheet.create({
   form: {flex: 1, justifyContent: 'space-between', paddingHorizontal: 16},
   inputWrapper: {gap: 10},
   textarea: {
-    height: 300,
+    height: 200,
     alignItems: 'flex-start',
+    padding: 10,
   },
   submitButton: {
-    marginTop: 30,
     marginBottom: 16,
     backgroundColor: Colors.primary,
   },

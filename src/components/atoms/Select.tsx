@@ -16,7 +16,7 @@ import {
   ViewStyle,
   useColorScheme,
 } from 'react-native';
-import {Colors} from 'constants/theme';
+import {Colors, HIT_SLOP} from 'constants/theme';
 import Icon from './Icon';
 import {ActionSheet, ActionSheetItem} from './ActionSheet';
 
@@ -67,18 +67,14 @@ const Input: ForwardRefRenderFunction<View, SelectProps> = (
 
   const inputWrapperStyle = {
     height: 48,
-    flexDirection: 'row',
-    alignItems: 'center',
     borderRadius: 8,
     backgroundColor: backgroundColor,
     paddingHorizontal: 10,
+    borderWidth: errorText ? 1 : 0,
+    borderColor: errorText ? errorColor : 'transparent',
   };
-  const inputStyle = {color: isDisabled ? disabledColor : textColor};
 
-  const errorStyle = {
-    borderWidth: 1,
-    borderColor: errorColor,
-  };
+  const inputStyle = {color: isDisabled ? disabledColor : textColor};
 
   const captionTextStyle = {
     fontSize: 14,
@@ -112,27 +108,26 @@ const Input: ForwardRefRenderFunction<View, SelectProps> = (
     <>
       <View style={styles.baseWrapper}>
         <Pressable
+          hitSlop={HIT_SLOP}
           onPress={handlePressSelect}
-          style={[
-            styles.textInputWrapper,
-            isDisabled,
-            errorText && errorStyle,
-            inputWrapperStyle,
-            style,
-          ]}>
-          <TextInput
-            value={selectedOption?.value}
-            placeholder={placeholder}
-            placeholderTextColor={isDisabled ? disabledColor : placeholderColor}
-            secureTextEntry={type === 'password'}
-            autoComplete="off"
-            readOnly
-            editable={!isDisabled}
-            selectionColor={Colors.primary}
-            style={[styles.textInput, inputStyle]}
-          />
-          <View style={styles.endContent}>
-            <Icon name={'expand_more'} />
+          style={[inputWrapperStyle, style]}>
+          <View style={styles.textInputWrapper}>
+            <TextInput
+              value={selectedOption?.value}
+              placeholder={placeholder}
+              placeholderTextColor={
+                isDisabled ? disabledColor : placeholderColor
+              }
+              secureTextEntry={type === 'password'}
+              autoComplete="off"
+              readOnly
+              editable={!isDisabled}
+              selectionColor={Colors.primary}
+              style={[styles.textInput, inputStyle]}
+            />
+            <View style={styles.endContent}>
+              <Icon name={'expand_more'} />
+            </View>
           </View>
         </Pressable>
         {errorText ? (
@@ -162,7 +157,12 @@ export default forwardRef(Input);
 
 const styles = StyleSheet.create({
   baseWrapper: {},
-  textInputWrapper: {},
+  textInputWrapper: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    pointerEvents: 'none',
+  },
   textInput: {
     flex: 1,
     fontSize: 16,
