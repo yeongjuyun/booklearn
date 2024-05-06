@@ -39,6 +39,7 @@ export type SettingStackParamList = {
   ThemeSetting: undefined;
   Policy: undefined;
   PolicyDetail: {type: Policy};
+  Inquire: undefined;
 };
 
 export type FeedStackParamList = {

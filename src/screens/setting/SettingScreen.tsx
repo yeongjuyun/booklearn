@@ -36,22 +36,6 @@ const SettingScreen = ({navigation}: SettingScreenProps) => {
     Alert.alert('업데이트 예정', '현재 준비중인 기능입니다', [{text: '확인'}]);
   };
 
-  const handlePressInquire = async () => {
-    const recipientEmail = 'booklearn.contact@gmail.com';
-    const subject = encodeURIComponent('제목');
-    const body = encodeURIComponent('메일 내용을 입력하세요');
-
-    const mailtoLink = `mailto:${recipientEmail}?subject=${subject}&body=${body}`;
-
-    try {
-      await Linking.openURL(mailtoLink);
-    } catch (error) {
-      Alert.alert('', `메일 앱을 여는 중 오류 발생:, ${error}`, [
-        {text: '확인'},
-      ]);
-    }
-  };
-
   const fetchAppVersion = () => {
     Api.default.getAppVersions(undefined, response => {
       if (response.type === ResponseType.SUCCESS) {
@@ -152,7 +136,10 @@ const SettingScreen = ({navigation}: SettingScreenProps) => {
             title="앱 버전"
             endContent={<Text body>{appVersion}</Text>}
           />
-          <ListItem title="문의하기" onPress={handlePressInquire} />
+          <ListItem
+            title="문의하기"
+            onPress={() => navigation.navigate('Inquire')}
+          />
           <ListItem title="로그아웃" onPress={handlePressLogout} />
         </View>
       </View>

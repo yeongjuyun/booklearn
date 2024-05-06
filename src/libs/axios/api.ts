@@ -393,12 +393,23 @@ const bookshelfApis = {
   },
 };
 
+const settingApis = {
+  postInquire: async (
+    payload: {category: string; content: string},
+    callback?: (response: Response) => void,
+    navigation?: any,
+  ) => {
+    await POST('/support', payload, callback, navigation);
+  },
+};
+
 const Api = {
   default: defaultApis,
   auth: authApis,
   user: userApis,
   book: bookApis,
   bookshelf: bookshelfApis,
+  setting: settingApis,
 };
 
 export default Api;
