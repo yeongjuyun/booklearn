@@ -82,8 +82,8 @@ android {
         applicationId "com.zipcoker.booklearn"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.1"
+        versionCode 9
+        versionName "1.0.1"
         // Google Login
         multiDexEnabled true
     }
@@ -94,6 +94,12 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            storeFile file('upload.keystore')
+            storePassword 'booklearn'
+            keyAlias 'upload'
+            keyPassword 'booklearn'
+        }
     }
     buildTypes {
         debug {
@@ -102,7 +108,7 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
