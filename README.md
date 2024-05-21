@@ -80,8 +80,6 @@
 
 ### 3-1. 테크스택
 
-<img width="500" alt="기술스택" src="https://user-images.githubusercontent.com/32115010/180592777-693bd01c-e531-4e77-899d-20d0d55ac9f3.png">
-
 - 프론트엔드
   - 코어: TypeScript, React Native
   - 상태관리: SWR, Firebase
@@ -90,8 +88,8 @@
   
 - 백엔드 
   - 서버: TypeScript, Nest.js
-  - DataBase: MongoDB
-  - Infra : aws EC2
+  - 데이터베이스: MongoDB
+  - 인프라 : aws EC2
 
 <br>
 
